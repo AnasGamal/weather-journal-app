@@ -4,5 +4,11 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.17.2"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.3.2"
+  },
+  "scripts": {
+    "build:css": "tailwindcss build ./website/app.css -o ./website/tailwind.css"
   }
 }

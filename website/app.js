@@ -2,7 +2,7 @@
 
 // Personal API Key for OpenWeatherMap API
 const weatherAPIBaseURL = 'https://api.openweathermap.org/data/2.5/weather?zip='
-const weatherAPIKey = `&appid=b0aef9272bd5539e748f1aa1a1dce780&units=metric`;
+const weatherAPIKey = `&appid=<YOUR-API-KEY-HERE>&units=metric`;
 // UI
 
 const dateElement = document.getElementById('date');

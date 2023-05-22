@@ -3,32 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <title>Weather Journal</title>
-<link href="https://fonts.googleapis.com/css?family=Oswald:400,600,700|Ranga:400,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link href="tailwind.css" rel="stylesheet">
 </head>
-<body>
-    <div id="app">
-        <div class="holder headline">
-            Weather Journal App
+<body class="bg-gray-100 font-sans">
+  <div id="app" class="flex justify-center items-center min-h-screen">
+    <div class="container mx-auto py-8">
+      <div class="holder headline text-4xl font-bold text-center text-gray-800">
+          Welcome back to the Weather Journal App!
+      </div>
+      <div class="holder zip mt-4 text-center">
+          <label for="zip" class="text-lg font-medium text-gray-700">Enter your Zip Code:</label>
+          <input type="text" id="zip" placeholder="E.g., 12345" class="border rounded p-2 mt-2 bg-white text-gray-800 placeholder-gray-400">
+      </div>
+      <div class="holder feel mt-4 text-center">
+          <label for="feelings" class="text-lg font-medium text-gray-700">How are you feeling today?</label>
+          <div>
+          <textarea class="myInput border rounded p-2 mt-2 bg-white text-gray-800 placeholder-gray-400" id="feelings" placeholder="Share your thoughts and feelings about the weather, your day, or anything else!" rows="9" cols="50"></textarea>
         </div>
-        <div class="holder zip">
-            <label for="zip">Enter Zipcode here</label>
-            <input type="text" id="zip" placeholder="Enter zip code here">
-        </div>
-        <div class="holder feel">
-            <label for="feelings">How are you feeling today?</label>
-            <textarea class="myInput" id="feelings" placeholder="Enter your feelings here" rows="9" cols="50"></textarea>
-            <button id="generate" type="submit">Generate</button>
-        </div>
-        <div class="holder entry">
-            <div class="title">Most Recent Entry</div>
-            <div id="entryHolder">
-                <div id="date"></div> 
-                <div id="temp"></div>
-                <div id="content"></div>
-            </div>
-        </div>
+        <button id="generate" type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Add Entry</button>
+      </div>
+      <div class="holder entry mt-8 text-center">
+          <div class="title text-2xl font-bold text-gray-800">Most Recent Entry</div>
+          <div id="entryHolder" class="mt-4">
+              <div id="date" class="text-lg text-gray-700"></div> 
+              <div id="temp" class="text-lg text-gray-700"></div>
+              <div id="content" class="text-lg text-gray-700"></div>
+          </div>
+      </div>
     </div>
-    <script src="app.js" type="text/javascript"></script>
+  </div>
+  <script src="app.js" type="text/javascript"></script>
 </body>
 </html>
