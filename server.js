@@ -1,16 +1,14 @@
-require('dotenv').config(); 
-
 // Setup empty JS object to act as endpoint for all routes
-projectData = {};
-
-const weatherAPIKey = `&appid=${process.env.OPENWEATHERMAP_API_KEY}&units=metric`;
-  
+projectData = {};  
 
 // Require Express to run server and routes
 const express = require('express');
 
 // Start up an instance of app
 const app = express();
+// load .env file
+require('dotenv').config();
+const weatherAPIKey = `&appid=${process.env.OPEN_WEATHER_API_KEY}&units=metric`;
 
 /* Dependencies */
 const bodyParser = require('body-parser')
@@ -48,7 +46,6 @@ app.post('/saveData', (req, res)=>{
     }
   );
 
-// GET method route to send the weather API key to the client
-app.get('/getWeatherAPIKey', (req, res) => {
-    res.send({ weatherAPIKey: process.env.OPENWEATHERMAP_API_KEY });
-  });
+  app.get('/getAPIKey', (req, res) => {
+    res.send({ key: `&appid=${process.env.OPEN_WEATHER_API_KEY}&units=metric` });
+});

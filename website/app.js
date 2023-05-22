@@ -2,9 +2,18 @@
 
 // Personal API Key for OpenWeatherMap API
 const weatherAPIBaseURL = 'https://api.openweathermap.org/data/2.5/weather?zip='
-const weatherAPIKey = `&appid=<YOUR-API-KEY-HERE>&units=metric`;
+// Fetch the API key from the server
+const getAPIKey = async () => {
+    const res = await fetch('/getAPIKey');
+    try {
+      const data = await res.json();
+      return data.key;
+    } catch (error) {
+      console.log('error', error);
+    }
+  }
+  
 // UI
-
 const dateElement = document.getElementById('date');
 const tempElement = document.getElementById('temp');
 const contentElement = document.getElementById('content');
@@ -14,15 +23,17 @@ const generateButton = document.getElementById('generate');
 let currentDate = new Date();
 let formattedDate = `${currentDate.getMonth()+1}/${currentDate.getDate()}/${currentDate.getFullYear()}`; // Get current date at time of request
 
-const handleGenerateButtonClick = (e)=>{
+const handleGenerateButtonClick = async (e) => {
     let zipCode = document.getElementById('zip').value;
     let feelings = document.getElementById('feelings').value;
-    getWeatherData(weatherAPIBaseURL,zipCode,weatherAPIKey)
-    .then(function(apiData){
-        saveData('/saveData', {temp:apiData.main.temp,date:formattedDate,content:feelings})
-   })
-   .then(()=>updateUI());
-}
+    const apiKey = await getAPIKey();
+    getWeatherData(weatherAPIBaseURL,zipCode,apiKey)
+      .then(function(apiData){
+          saveData('/saveData', {temp:apiData.main.temp,date:formattedDate,content:feelings})
+     })
+     .then(()=>updateUI());
+  }
+  
 
 generateButton.addEventListener('click', handleGenerateButtonClick);
 
