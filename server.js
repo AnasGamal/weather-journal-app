@@ -24,9 +24,11 @@ app.use(cors());
 app.use(express.static('src'));
 
 // Setup Server
-const port = 3005;
-const server = app.listen(port, ()=>{console.log(`server is listening on port: ${port}`);});
-
+const server = app.listen(0, () => {
+    const port = server.address().port;
+    console.log(`Server is listening on port: ${port}`);
+  });
+  
 
 // GET method route
 app.get('/getWeatherData', (req, res)=>{
