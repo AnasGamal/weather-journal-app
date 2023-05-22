@@ -1,5 +1,10 @@
+require('dotenv').config(); 
+
 // Setup empty JS object to act as endpoint for all routes
 projectData = {};
+
+const weatherAPIKey = `&appid=${process.env.OPENWEATHERMAP_API_KEY}&units=metric`;
+  
 
 // Require Express to run server and routes
 const express = require('express');
@@ -21,23 +26,29 @@ app.use(cors());
 app.use(express.static('website'));
 
 // Setup Server
-const port = 3000;
+const port = 3005;
 const server = app.listen(port, ()=>{console.log(`server is listening on port: ${port}`);});
 
+
 // GET method route
-app.get('/getData', (req, res)=>{
+app.get('/getWeatherData', (req, res)=>{
 res.send(projectData);
 });
 
 // POST method route
 const data = [];
-app.post('/postData', (req, res)=>{
-    newStuff = {
+app.post('/saveData', (req, res)=>{
+    newData = {
     temp: req.body.temp,
     date:  req.body.date,
     content: req.body.content
 }
-    projectData = newStuff;
+    projectData = newData;
     res.send(projectData);
     }
   );
+
+// GET method route to send the weather API key to the client
+app.get('/getWeatherAPIKey', (req, res) => {
+    res.send({ weatherAPIKey: process.env.OPENWEATHERMAP_API_KEY });
+  });

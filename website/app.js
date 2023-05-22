@@ -1,38 +1,36 @@
 /* Global Variables */
 
 // Personal API Key for OpenWeatherMap API
-const baseURL = 'https://api.openweathermap.org/data/2.5/weather?zip='
-const apiKey = '&appid=<Your_API_Key_Here>&units=metric';
-
+const weatherAPIBaseURL = 'https://api.openweathermap.org/data/2.5/weather?zip='
+const weatherAPIKey = `&appid=b0aef9272bd5539e748f1aa1a1dce780&units=metric`;
 // UI
 
-const dateText = document.getElementById('date');
-const tempText = document.getElementById('temp');
-const contentText = document.getElementById('content');
+const dateElement = document.getElementById('date');
+const tempElement = document.getElementById('temp');
+const contentElement = document.getElementById('content');
 const generateButton = document.getElementById('generate');
 
 // Create a new date instance dynamically with JS
-let d = new Date();
-let lastDate = `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`; // Get current date at time of request
+let currentDate = new Date();
+let formattedDate = `${currentDate.getMonth()+1}/${currentDate.getDate()}/${currentDate.getFullYear()}`; // Get current date at time of request
 
-const doStuff = (e)=>{
+const handleGenerateButtonClick = (e)=>{
     let zipCode = document.getElementById('zip').value;
     let feelings = document.getElementById('feelings').value;
-    getData(baseURL,zipCode,apiKey)
+    getWeatherData(weatherAPIBaseURL,zipCode,weatherAPIKey)
     .then(function(apiData){
-        postData('/postData', {temp:apiData.main.temp,date:lastDate,content:feelings})
+        saveData('/saveData', {temp:apiData.main.temp,date:formattedDate,content:feelings})
    })
-   .then(()=>updateElements());
+   .then(()=>updateUI());
 }
 
-generateButton.addEventListener('click', doStuff);
-
+generateButton.addEventListener('click', handleGenerateButtonClick);
 
 
 // GET request function
 
-const getData = async(baseURL,zipCode,apiKey)=>{
-    const res = await fetch(baseURL+zipCode+apiKey);
+const getWeatherData = async(weatherAPIBaseURL,zipCode,weatherAPIKey)=>{
+    const res = await fetch(weatherAPIBaseURL+zipCode+weatherAPIKey);
     try{
         const data = await res.json();
         return data;
@@ -44,7 +42,7 @@ const getData = async(baseURL,zipCode,apiKey)=>{
 
 
 // POST request function
-const postData = async(url='/postData',data={})=>{
+const saveData = async(url='/saveData',data={})=>{
     const res = await fetch(url, {
         method: 'POST', 
         credentials: 'same-origin', 
@@ -65,14 +63,14 @@ const postData = async(url='/postData',data={})=>{
 
 // Update user UI elements
 
-const updateElements = async() => {
- const req = await fetch('/getData');
+const updateUI = async() => {
+ const req = await fetch('/getWeatherData');
  try{
      const dataComplete = await req.json();
 
-     dateText.innerHTML= `Date: ${dataComplete.date}`;
-     tempText.innerHTML= `Tempreture: ${Math.round(dataComplete.temp)}°C`;
-     contentText.innerHTML= `Feelings: ${dataComplete.content}`;
+     dateElement.innerHTML= `Date: ${dataComplete.date}`;
+     tempElement.innerHTML= `Tempreture: ${Math.round(dataComplete.temp)}°C`;
+     contentElement.innerHTML= `Feelings: ${dataComplete.content}`;
  }
  catch(error){
      console.log('error', error);
