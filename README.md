@@ -10,6 +10,7 @@ This is a dynamic single-page web application that allows the user to input thei
 - Body-Parser
 - Cors
 - OpenWeatherMap API
+- Tailwind CSS
 
 ## Installation
 
