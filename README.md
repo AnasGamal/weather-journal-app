@@ -1,6 +1,6 @@
 # Weather Journal App
 
-This is a dynamic single-page web application that allows the user to input their zip code and feelings to generate weather data based on the zip code and save a record along with user input feelings. It utilizes an external weather API to retrieve weather data and dynamically updates the UI to display the returned information. The app also has a responsive design that can adapt to different screen widths.
+This is a dynamic single-page web application that allows the user to input their zip code and feelings to generate weather data based on the zip code and save a record along with user input feelings. It utilizes an external weather API to retrieve weather data and dynamically updates the UI to display the returned information. The app also has a responsive design that can adapt to different screen widths. You can view the project here: https://weather-journal-app-l60u.onrender.com/
 
 ## Technologies and Dependencies
 
