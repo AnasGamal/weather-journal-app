@@ -11,7 +11,7 @@
     "webpack-cli": "^4.8.0"
   },
   "scripts": {
-    "build:css": "tailwindcss build ./website/app.css -o ./website/tailwind.css",
+    "build:css": "tailwindcss build ./src/app.css -o ./src/tailwind.css",
     "build": "webpack"
   }
 }

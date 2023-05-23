@@ -42,6 +42,7 @@ const updateUI = async() => {
        const weatherData = await weatherDataRequest.json();
        if (!isUIUpdated) {
         // call a function that loops through array and render elements
+        entryHolder.innerHTML = '';
         updateEntry(weatherData);
         }
     }
