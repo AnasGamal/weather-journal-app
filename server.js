@@ -8,9 +8,11 @@ const path = require('path');
 const app = express();
 // load .env file
 require('dotenv').config();
-
 const port = process.env.PORT || 3000;
-
+let fetch;
+(async () => {
+  fetch = (await import('node-fetch')).default;
+})();
 // Serve static files from the 'src' directory
 app.use(express.static(path.join(__dirname, 'src')));
 
@@ -52,7 +54,28 @@ app.post('/saveData', (req, res)=>{
     }
   );
 
-  app.get('/getAPIKey', (req, res) => {
-    res.send({ key: `${process.env.OPEN_WEATHER_API_KEY}` });
+const fetchWeatherData = async(req)=>{
+  const zipCode = req.query.zip;
+  const units = req.query.units;
+  const apiKey = process.env.OPEN_WEATHER_API_KEY;
+  let weatherAPIurl = `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode}&units=${units}&apiKey=${apiKey}`;
+  const res = await fetch(weatherAPIurl);
+  try{
+      const data = await res.json();
+      return data;
+  }
+  catch(error) {
+      console.log('error', error);
+  }
+}
+app.get('/fetchWeatherData', async (req, res) => {
+  try {
+    const weatherData = await fetchWeatherData(req);
+    res.send(weatherData);
+  } catch (error) {
+    console.log('error', error);
+    res.status(500).send({error: 'Server error'});
+  }
 });
+
 app.listen(port, () => console.log(`app listening on port ${port}!`));

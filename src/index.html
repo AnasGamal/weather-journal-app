@@ -7,24 +7,27 @@
 </head>
 <body class="bg-gray-100 font-sans">
   <div id="app" class="flex justify-center items-center min-h-screen">
-    <div class="container mx-auto py-8">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-screen-md">
       <div class="holder headline text-4xl font-bold text-center text-gray-800">
           Welcome back to the Weather Journal App!
       </div>
-      <div class="holder zip mt-4 text-center">
-          <label for="zip" class="text-lg font-medium text-gray-700">Enter your Zip Code:</label>
-          <input type="text" id="zip" placeholder="E.g., 12345" class="border rounded p-2 mt-2 bg-white text-gray-800 placeholder-gray-400">
+      <div class="holder zip mt-4 flex items-center justify-center">
+        <label for="zip" class="text-lg font-medium text-gray-700 mr-2">Enter your ZIP Code:</label>
+        <div class="w-auto">
+          <input type="text" id="zip" placeholder="E.g., 12345" class="border rounded p-2 bg-white text-gray-800 placeholder-gray-400">
+        </div>
       </div>
+    
       <div class="holder feel mt-4 text-center">
           <label for="feelings" class="text-lg font-medium text-gray-700">How are you feeling today?</label>
           <div>
-            <textarea class="myInput border rounded p-2 mt-2 bg-white text-gray-800 placeholder-gray-400 shadow" id="feelings" placeholder="Share your thoughts and feelings about the weather, your day, or anything else!" rows="9" cols="50"></textarea>
+            <textarea class="myInput border rounded p-2 mt-2 bg-white text-gray-800 placeholder-gray-400 shadow w-full" id="feelings" placeholder="Share your thoughts and feelings about the weather, your day, or anything else!" rows="9" cols="50"></textarea>
           </div>
           <button id="generate" type="button" class="mt-2 text-white bg-purple-700 hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-full text-sm px-5 py-2.5 text-center dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Add Entry</button>
       </div>
       <div class="holder entry mt-4 ">
         <div class="title text-2xl font-bold text-gray-800 text-center">Entries</div>
-        <div id="entryContainer" class="max-w-md h-36 mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow mt-4 overflow-auto">
+        <div id="entryContainer" class="max-w-full h-36 mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow mt-4 overflow-auto">
           <div id="entryHolder" class="text-lg text-left text-gray-700">
           </div>
         </div>
