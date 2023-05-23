@@ -40,6 +40,11 @@ const updateUI = async() => {
 
 
    const updateEntry = (weatherData) => {
+    if (weatherData.length === 0) {
+        const entryDiv = document.createElement('div');
+        entryDiv.textContent = 'No entries yet.';
+        entryHolder.prepend(entryDiv);
+    } else {
     weatherData.forEach(entry => {
         // create a div container for entry contents
         const entryDiv = document.createElement('div');
@@ -60,7 +65,7 @@ const updateUI = async() => {
 
         // add new entry to the beginning of entryHolder container
         entryHolder.prepend(entryDiv);
-      });
+      })};
       isUIUpdated = true;
     }
 
