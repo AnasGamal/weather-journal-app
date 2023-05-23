@@ -8,7 +8,6 @@ const express = require('express');
 const app = express();
 // load .env file
 require('dotenv').config();
-const weatherAPIKey = `&appid=${process.env.OPEN_WEATHER_API_KEY}&units=metric`;
 
 /* Dependencies */
 const bodyParser = require('body-parser')
@@ -32,6 +31,7 @@ const server = app.listen(0, () => {
 
 // GET method route
 app.get('/getWeatherData', (req, res)=>{
+    console.log(projectData);
 res.send(projectData);
 });
 

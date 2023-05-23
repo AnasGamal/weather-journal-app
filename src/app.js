@@ -23,7 +23,7 @@ const generateButton = document.getElementById('generate');
 let currentDate = new Date();
 let formattedDate = `${currentDate.getMonth()+1}/${currentDate.getDate()}/${currentDate.getFullYear()}`; // Get current date at time of request
 
-const handleGenerateButtonClick = async (e) => {
+const handleGenerateButtonClick = async () => {
     let zipCode = document.getElementById('zip').value;
     let feelings = document.getElementById('feelings').value;
     const apiKey = await getAPIKey();
