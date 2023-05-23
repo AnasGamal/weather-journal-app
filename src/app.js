@@ -12,9 +12,7 @@ const getAPIKey = async () => {
   }
   
 // UI
-const dateElement = document.getElementById('date');
-const tempElement = document.getElementById('temp');
-const contentElement = document.getElementById('content');
+const entryHolder = document.getElementById('entryHolder');
 const generateButton = document.getElementById('generate');
 
 // Create a new date instance dynamically with JS
@@ -26,7 +24,7 @@ const handleGenerateButtonClick = async () => {
     let feelings = document.getElementById('feelings').value;
     let apiKey = await getAPIKey();
     let weatherAPIurl = `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode}&units=${units}&apiKey=${apiKey}`;
-    getWeatherData(weatherAPIurl)
+    fetchWeatherData(weatherAPIurl)
       .then(function(apiData){
           saveData('/saveData', {temp:apiData.main.temp,date:formattedDate,content:feelings})
      })
@@ -36,10 +34,45 @@ const handleGenerateButtonClick = async () => {
 
 generateButton.addEventListener('click', handleGenerateButtonClick);
 
+const updateUI = async() => {
+    const req = await fetch('/getWeatherData');
+    try{
+       const dataComplete = await req.json();
+       dataComplete.forEach(obj => {
+           // create a div container for entry contents
+           const entryDiv = document.createElement('div');
+           entryDiv.classList.add('entry');
+   
+           // create and append date div element to entry container
+           const dateElement = document.createElement('div');
+           dateElement.textContent= `Date: ${obj.date}`;
+           entryDiv.appendChild(dateElement);
+   
+            // create and append temperature div element to entry container
+           const tempElement = document.createElement('div');
+           tempElement.textContent= `Tempreture: ${Math.round(obj.temp)}°F`;
+           entryDiv.appendChild(tempElement)
+   
+            // create and append content div element to entry container
+            const contentElement = document.createElement('div');
+           contentElement.textContent= `Feelings: ${obj.content}`;
+           entryDiv.appendChild(contentElement);
+
+           // add new entry to the beginning of entryHolder container
+           entryHolder.prepend(entryDiv);
+   
+         });
+         console.log(dataComplete)
+    }
+    catch(error){
+        console.log('error', error);
+    }
+   }   
+updateUI();
 
 // GET request function
 
-const getWeatherData = async(weatherAPIurl)=>{
+const fetchWeatherData = async(weatherAPIurl)=>{
     const res = await fetch(weatherAPIurl);
     try{
         const data = await res.json();
@@ -72,17 +105,3 @@ const saveData = async(url='/saveData',data={})=>{
 
 
 // Update user UI elements
-
-const updateUI = async() => {
- const req = await fetch('/getWeatherData');
- try{
-     const dataComplete = await req.json();
-
-     dateElement.innerHTML= `Date: ${dataComplete.date}`;
-     tempElement.innerHTML= `Tempreture: ${Math.round(dataComplete.temp)}°F`;
-     contentElement.innerHTML= `Feelings: ${dataComplete.content}`;
- }
- catch(error){
-     console.log('error', error);
- }
-}

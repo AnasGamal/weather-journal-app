@@ -1,5 +1,5 @@
 // Setup empty JS object to act as endpoint for all routes
-projectData = {};  
+projectData = [];  
 
 // Require Express to run server and routes
 const express = require('express');
@@ -42,17 +42,17 @@ res.send(projectData);
 
 // POST method route
 app.post('/saveData', (req, res)=>{
-    newData = {
+    var newData = {
     temp: req.body.temp,
     date:  req.body.date,
     content: req.body.content
-}
-    projectData = newData;
+    }
+    projectData.push(newData);
     res.send(projectData);
     }
   );
 
   app.get('/getAPIKey', (req, res) => {
-    res.send({ key: `&appid=${process.env.OPEN_WEATHER_API_KEY}` });
+    res.send({ key: `${process.env.OPEN_WEATHER_API_KEY}` });
 });
 app.listen(port, () => console.log(`app listening on port ${port}!`));
