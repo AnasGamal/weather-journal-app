@@ -1,5 +1,6 @@
 /* Global Variables */
 const units = 'metric';
+let isUIUpdated = false;
 // Fetch the API key from the server
 const getAPIKey = async () => {
     const res = await fetch('/getAPIKey');
@@ -24,11 +25,11 @@ const handleGenerateButtonClick = async () => {
     let feelings = document.getElementById('feelings').value;
     let apiKey = await getAPIKey();
     let weatherAPIurl = `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode}&units=${units}&apiKey=${apiKey}`;
-    fetchWeatherData(weatherAPIurl)
-      .then(function(apiData){
-          saveData('/saveData', {temp:apiData.main.temp,date:formattedDate,content:feelings})
-     })
-     .then(()=>updateUI());
+    const apiData = await fetchWeatherData(weatherAPIurl);
+    await saveData('/saveData', {temp:apiData.main.temp,date:formattedDate,content:feelings});
+    isUIUpdated = false;
+    await updateUI();
+    isUIUpdated = true;
   }
   
 
@@ -38,6 +39,7 @@ const updateUI = async() => {
     const req = await fetch('/getWeatherData');
     try{
        const dataComplete = await req.json();
+       if (!isUIUpdated) {
        dataComplete.forEach(obj => {
            // create a div container for entry contents
            const entryDiv = document.createElement('div');
@@ -63,12 +65,14 @@ const updateUI = async() => {
    
          });
          console.log(dataComplete)
+         isUIUpdated = true;
+        }
     }
     catch(error){
         console.log('error', error);
     }
    }   
-updateUI();
+   updateUI();
 
 // GET request function
 
