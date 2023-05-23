@@ -15,8 +15,9 @@ app.use(express.static(path.join(__dirname, 'src')));
 
 // Serve the 'index.html' file
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'src', 'index.html', 'tailwind.css'));
+  res.sendFile(path.join(__dirname, 'src', 'index.html'));
 });
+
 
 /* Dependencies */
 const bodyParser = require('body-parser')
@@ -30,12 +31,6 @@ const cors = require('cors');
 app.use(cors());
 // Initialize the main project folder
 app.use(express.static('src/'));
-
-// Setup Server
-const server = app.listen(0, () => {
-    const port = process.env.PORT || server.address().port;
-    console.log(`Server is listening on port: ${port}`);
-  });
   
 
 // GET method route
@@ -59,3 +54,4 @@ app.post('/saveData', (req, res)=>{
   app.get('/getAPIKey', (req, res) => {
     res.send({ key: `&appid=${process.env.OPEN_WEATHER_API_KEY}&units=imperial` });
 });
+app.listen(port, () => console.log(`app listening on port ${port}!`));
