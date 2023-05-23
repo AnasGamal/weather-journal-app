@@ -80,7 +80,7 @@ const updateUI = async() => {
      const dataComplete = await req.json();
 
      dateElement.innerHTML= `Date: ${dataComplete.date}`;
-     tempElement.innerHTML= `Tempreture: ${Math.round(dataComplete.temp)}°C`;
+     tempElement.innerHTML= `Tempreture: ${Math.round(dataComplete.temp)}°F`;
      contentElement.innerHTML= `Feelings: ${dataComplete.content}`;
  }
  catch(error){

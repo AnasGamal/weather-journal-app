@@ -24,7 +24,7 @@ app.use(express.static('src'));
 
 // Setup Server
 const server = app.listen(0, () => {
-    const port = server.address().port;
+    const port = process.env.PORT || server.address().port;
     console.log(`Server is listening on port: ${port}`);
   });
   
@@ -49,5 +49,5 @@ app.post('/saveData', (req, res)=>{
   );
 
   app.get('/getAPIKey', (req, res) => {
-    res.send({ key: `&appid=${process.env.OPEN_WEATHER_API_KEY}&units=metric` });
+    res.send({ key: `&appid=${process.env.OPEN_WEATHER_API_KEY}&units=imperial` });
 });
