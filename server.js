@@ -9,6 +9,15 @@ const app = express();
 // load .env file
 require('dotenv').config();
 
+
+// Serve static files from the 'src' directory
+app.use(express.static(path.join(__dirname, 'src')));
+
+// Serve the 'index.html' file
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'src', 'index.html', 'tailwind.css'));
+});
+
 /* Dependencies */
 const bodyParser = require('body-parser')
 /* Middleware*/
@@ -36,7 +45,6 @@ res.send(projectData);
 });
 
 // POST method route
-const data = [];
 app.post('/saveData', (req, res)=>{
     newData = {
     temp: req.body.temp,
