@@ -6,6 +6,7 @@ let db;
 // UI
 const entryHolder = document.getElementById('entryHolder');
 const generateButton = document.getElementById('generate');
+const clearButton = document.getElementById('confirmClear');
 
 // Create a new date instance dynamically with JS
 let currentDate = new Date();
@@ -27,7 +28,23 @@ const handleGenerateButtonClick = async () => {
     updateUI();
 }
 
+const handleClearButtonClick = async () => {
+    const transaction = db.transaction(["weatherData"], "readwrite");
+    const objectStore = transaction.objectStore("weatherData");
+    const request = objectStore.clear();
+    request.onsuccess = () => {
+        // Clear the UI entries as well
+        entryHolder.innerHTML = '';
+        isUIUpdated = false;
+        updateUI();
+    }
+    request.onerror = (event) => {
+        console.log('Error clearing data:', event.target.error);
+    }
+}
+
 generateButton.addEventListener('click', handleGenerateButtonClick);
+clearButton.addEventListener('click', handleClearButtonClick);
 
 const updateUI = async() => {
     try{
