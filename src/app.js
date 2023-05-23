@@ -28,51 +28,56 @@ const handleGenerateButtonClick = async () => {
     const apiData = await fetchWeatherData(weatherAPIurl);
     await saveData('/saveData', {temp:apiData.main.temp,date:formattedDate,content:feelings});
     isUIUpdated = false;
-    await updateUI();
-    isUIUpdated = true;
+    updateUI();
   }
   
 
 generateButton.addEventListener('click', handleGenerateButtonClick);
 
+// Update user UI elements
 const updateUI = async() => {
-    const req = await fetch('/getWeatherData');
+    const weatherDataRequest = await fetch('/getWeatherData');
     try{
-       const dataComplete = await req.json();
+        // returns an array of entries objects
+       const weatherData = await weatherDataRequest.json();
        if (!isUIUpdated) {
-       dataComplete.forEach(obj => {
-           // create a div container for entry contents
-           const entryDiv = document.createElement('div');
-           entryDiv.classList.add('entry');
-   
-           // create and append date div element to entry container
-           const dateElement = document.createElement('div');
-           dateElement.textContent= `Date: ${obj.date}`;
-           entryDiv.appendChild(dateElement);
-   
-            // create and append temperature div element to entry container
-           const tempElement = document.createElement('div');
-           tempElement.textContent= `Tempreture: ${Math.round(obj.temp)}°F`;
-           entryDiv.appendChild(tempElement)
-   
-            // create and append content div element to entry container
-            const contentElement = document.createElement('div');
-           contentElement.textContent= `Feelings: ${obj.content}`;
-           entryDiv.appendChild(contentElement);
-
-           // add new entry to the beginning of entryHolder container
-           entryHolder.prepend(entryDiv);
-   
-         });
-         console.log(dataComplete)
-         isUIUpdated = true;
+        // call a function that loops through array and render elements
+        updateEntry(weatherData);
         }
     }
     catch(error){
         console.log('error', error);
     }
    }   
-   updateUI();
+
+
+   const updateEntry = (weatherData) => {
+    weatherData.forEach(entry => {
+        // create a div container for entry contents
+        const entryDiv = document.createElement('div');
+        entryDiv.classList.add('entryDiv');
+
+        // create date div element
+        const dateElement = document.createElement('div', `Date: ${entry.date}`);
+        dateElement.textContent= `Date: ${entry.date}`;   
+         // create temperature div element 
+        const tempElement = document.createElement('div');
+        tempElement.textContent= `Tempreture: ${Math.round(entry.temp)}°F`;
+         // create content div element
+         const contentElement = document.createElement('div');
+        contentElement.textContent= `Feelings: ${entry.content}`;
+
+        // append created elements to created div container
+        entryDiv.append(dateElement, tempElement, contentElement);
+
+        // add new entry to the beginning of entryHolder container
+        entryHolder.prepend(entryDiv);
+      });
+      isUIUpdated = true;
+    }
+
+    // update the UI for the first time
+    updateUI();
 
 // GET request function
 
@@ -107,5 +112,3 @@ const saveData = async(url='/saveData',data={})=>{
     }
 };
 
-
-// Update user UI elements
