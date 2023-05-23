@@ -50,7 +50,7 @@ const updateUI = async() => {
         dateElement.textContent= `Date: ${entry.date}`;   
          // create temperature div element 
         const tempElement = document.createElement('div');
-        tempElement.textContent= `Tempreture: ${Math.round(entry.temp)}°F`;
+        tempElement.textContent= `Tempreture: ${Math.round(entry.temp)}°C`;
          // create content div element
          const contentElement = document.createElement('div');
         contentElement.textContent= `Feelings: ${entry.content}`;
