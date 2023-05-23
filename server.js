@@ -53,6 +53,6 @@ app.post('/saveData', (req, res)=>{
   );
 
   app.get('/getAPIKey', (req, res) => {
-    res.send({ key: `&appid=${process.env.OPEN_WEATHER_API_KEY}&units=imperial` });
+    res.send({ key: `&appid=${process.env.OPEN_WEATHER_API_KEY}` });
 });
 app.listen(port, () => console.log(`app listening on port ${port}!`));

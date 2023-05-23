@@ -1,7 +1,5 @@
 /* Global Variables */
-
-// Personal API Key for OpenWeatherMap API
-const weatherAPIBaseURL = 'https://api.openweathermap.org/data/2.5/weather?zip='
+const units = 'metric';
 // Fetch the API key from the server
 const getAPIKey = async () => {
     const res = await fetch('/getAPIKey');
@@ -26,8 +24,9 @@ let formattedDate = `${currentDate.getMonth()+1}/${currentDate.getDate()}/${curr
 const handleGenerateButtonClick = async () => {
     let zipCode = document.getElementById('zip').value;
     let feelings = document.getElementById('feelings').value;
-    const apiKey = await getAPIKey();
-    getWeatherData(weatherAPIBaseURL,zipCode,apiKey)
+    let apiKey = await getAPIKey();
+    let weatherAPIurl = `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode}&units=${units}&apiKey=${apiKey}`;
+    getWeatherData(weatherAPIurl)
       .then(function(apiData){
           saveData('/saveData', {temp:apiData.main.temp,date:formattedDate,content:feelings})
      })
@@ -40,8 +39,8 @@ generateButton.addEventListener('click', handleGenerateButtonClick);
 
 // GET request function
 
-const getWeatherData = async(weatherAPIBaseURL,zipCode,weatherAPIKey)=>{
-    const res = await fetch(weatherAPIBaseURL+zipCode+weatherAPIKey);
+const getWeatherData = async(weatherAPIurl)=>{
+    const res = await fetch(weatherAPIurl);
     try{
         const data = await res.json();
         return data;
