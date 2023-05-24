@@ -1,21 +1,30 @@
-/* Global Variables */
+// Global Variables
 let convertUnits = "metric";
 let isUIUpdated = false;
 let db;
 let latitude;
 let longitude;
 
-// UI
-const selectElement = document.getElementById('units');
-const entryHolder = document.getElementById('entryHolder');
-const generateButton = document.getElementById('generate');
-const clearButton = document.getElementById('confirmClear');
-const locationButton = document.getElementById('getLocation');
+// UI Elements
+const uiElements = {
+    selectElement: document.getElementById('units'),
+    entryHolder: document.getElementById('entryHolder'),
+    generateButton: document.getElementById('generate'),
+    clearButton: document.getElementById('confirmClear'),
+    locationButton: document.getElementById('getLocation')
+}
 
-
-// Create a new date instance dynamically with JS
+// Create a new date instance
 let currentDate = new Date();
 let formattedDate = `${currentDate.getMonth()+1}/${currentDate.getDate()}/${currentDate.getFullYear()}`;
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+uiElements.generateButton.addEventListener('click', handleGenerateButtonClick);
+uiElements.locationButton.addEventListener('click', handleLocationButtonClick);
+uiElements.clearButton.addEventListener('click', handleClearButtonClick);
+uiElements.selectElement.addEventListener('change', handleUnitsChange);
+});
 
 const getLocation = () => {
     return new Promise((resolve, reject) => {
@@ -54,7 +63,7 @@ const handleLocationButtonClick = async () => {
 }
 
 const handleUnitsChange = async () => {
-    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    const selectedOption = uiElements.selectElement.options[uiElements.selectElement.selectedIndex];
     convertUnits = selectedOption.value;  
     isUIUpdated = false;
     updateUI();
@@ -92,11 +101,6 @@ const handleClearButtonClick = async () => {
         console.log('Error clearing data:', event.target.error);
     }
 }
-
-generateButton.addEventListener('click', handleGenerateButtonClick);
-locationButton.addEventListener('click', handleLocationButtonClick);
-clearButton.addEventListener('click', handleClearButtonClick);
-selectElement.addEventListener('change', handleUnitsChange);
 
 const updateUI = async() => {
     try{
