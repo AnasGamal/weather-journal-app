@@ -110,7 +110,7 @@ const handleClearButtonClick = async () => {
     const request = objectStore.clear();
     request.onsuccess = () => {
         // Clear the UI entries as well
-        entryHolder.innerHTML = '';
+        uiElements.entryHolder.innerHTML = '';
         isUIUpdated = false;
         updateUI();
     }
@@ -165,7 +165,7 @@ const createEntryContainer = (date,kelvin,content) => {
     ${feelingsElement(content)}
     </div>
     `;
-    entryHolder.prepend(entryDiv);
+    uiElements.entryHolder.prepend(entryDiv);
 }
 
 const feelingsElement = (content) => `<div>Feelings: ${content}</div>`
@@ -184,6 +184,9 @@ const temperatureElement = (kelvin) => {
 // GET request function
 const fetchWeatherData = async (latitude, longitude) => {
     const res = await fetch(`/fetchWeatherData?lat=${latitude}&lon=${longitude}`);
+    if (!res.ok) {
+        throw new Error(`HTTP error!: ${res.status}`)
+    }
     try {
       const data = await res.json();
       return data;
