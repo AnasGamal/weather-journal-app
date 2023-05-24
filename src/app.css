@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+.entryHolder {
+    @apply max-w-full h-96 mx-auto overflow-auto;
+}
 .entryDiv {
-    @apply max-w-full h-36 mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow mt-4 overflow-auto;
-  }
+    @apply max-w-full w-[calc(100%-2rem)] h-36 mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow mt-4 overflow-auto text-sm;
+}
+
+.entryMeta {
+@apply font-mono font-bold;
+}
+.entryContent {
+    @apply text-sm;
+}
