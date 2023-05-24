@@ -1,15 +1,57 @@
 /* Global Variables */
-let convertUnits;
+let convertUnits = "metric";
 let isUIUpdated = false;
+let db;
+let latitude;
+let longitude;
+
 // UI
 const selectElement = document.getElementById('units');
 const entryHolder = document.getElementById('entryHolder');
 const generateButton = document.getElementById('generate');
 const clearButton = document.getElementById('confirmClear');
+const locationButton = document.getElementById('getLocation');
+
 
 // Create a new date instance dynamically with JS
 let currentDate = new Date();
-let formattedDate = `${currentDate.getMonth()+1}/${currentDate.getDate()}/${currentDate.getFullYear()}`; // Get current date at time of request
+let formattedDate = `${currentDate.getMonth()+1}/${currentDate.getDate()}/${currentDate.getFullYear()}`;
+
+const getLocation = () => {
+    return new Promise((resolve, reject) => {
+        if (!confirm("We need your location to provide weather data. Do you allow us to access your location?")) {
+            reject("User did not allow access to location.");
+        } else if (navigator.geolocation) {
+            // Define options object with enableHighAccuracy set to true
+            const options = {
+                enableHighAccuracy: true,
+            };
+
+            // Pass options object as the second parameter to getCurrentPosition
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    latitude = position.coords.latitude;
+                    longitude = position.coords.longitude;
+                    resolve();
+                },
+                error => {
+                    reject(console.log(error));
+                },
+                options
+            );
+        } else {
+            reject("Geolocation is not supported by this browser.");
+        }
+    });
+}
+
+const handleLocationButtonClick = async () => {
+    try {
+        await getLocation();
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 const handleUnitsChange = async () => {
     const selectedOption = selectElement.options[selectElement.selectedIndex];
@@ -19,44 +61,62 @@ const handleUnitsChange = async () => {
 }
 
 const handleGenerateButtonClick = async () => {
-    let zipCode = document.getElementById('zip').value;
     let feelings = document.getElementById('feelings').value;
-    const apiData = await fetchWeatherData(zipCode, units);
-    await saveData('/saveData', {temp:apiData.main.temp,date:formattedDate,content:feelings});
+    if (latitude === undefined || longitude === undefined) {
+    await handleLocationButtonClick();
+    }
+    const apiData = await fetchWeatherData(latitude, longitude);
+    const newData = {
+        temp: apiData.main.temp,
+        date: formattedDate,
+        content: feelings
+    }
+    const transaction = db.transaction(["weatherData"], "readwrite");
+    const objectStore = transaction.objectStore("weatherData");
+    objectStore.add(newData);
     isUIUpdated = false;
     updateUI();
-  }
-  
-  
+}
+
 const handleClearButtonClick = async () => {
-  await clearData();
-  isUIUpdated = false;
-  updateUI();
+    const transaction = db.transaction(["weatherData"], "readwrite");
+    const objectStore = transaction.objectStore("weatherData");
+    const request = objectStore.clear();
+    request.onsuccess = () => {
+        // Clear the UI entries as well
+        entryHolder.innerHTML = '';
+        isUIUpdated = false;
+        updateUI();
+    }
+    request.onerror = (event) => {
+        console.log('Error clearing data:', event.target.error);
+    }
 }
 
 generateButton.addEventListener('click', handleGenerateButtonClick);
+locationButton.addEventListener('click', handleLocationButtonClick);
 clearButton.addEventListener('click', handleClearButtonClick);
 selectElement.addEventListener('change', handleUnitsChange);
 
-// Update user UI elements
 const updateUI = async() => {
-    const weatherDataRequest = await fetch('/getWeatherData');
     try{
-        // returns an array of entries objects
-       const weatherData = await weatherDataRequest.json();
-       if (!isUIUpdated) {
-        // call a function that loops through array and render elements
-        entryHolder.innerHTML = '';
-        updateEntry(weatherData);
+        const transaction = db.transaction(["weatherData"], "readonly");
+        const objectStore = transaction.objectStore("weatherData");
+        const request = objectStore.getAll();
+        request.onsuccess = () => {
+            if (!isUIUpdated) {
+                // call a function that loops through array and render elements
+                entryHolder.innerHTML = '';
+                updateEntry(request.result);
+            }
         }
     }
     catch(error){
         console.log('error', error);
     }
-   }   
+}
 
-
-   const updateEntry = (weatherData) => {
+const updateEntry = (weatherData) => {
     if (weatherData.length === 0) {
         const entryDiv = document.createElement('div');
         entryDiv.innerHTML = `
@@ -97,54 +157,28 @@ const temperatureElement = (kelvin) => {
         return `<div>Temperature: ${imperial}°F</div>`;
     }
 }
+// IndexedDB setup
+const request = indexedDB.open("weatherDB", 1);
+request.onerror = function(event) {
+};
+request.onsuccess = function(event) {
+    db = request.result;
+    updateUI(); 
+};
+request.onupgradeneeded = function(event) {
+    let db = event.target.result;
+    let objectStore = db.createObjectStore("weatherData", {autoIncrement: true});
+};
 
-    // update the UI for the first time
-    updateUI();
+// update the UI for the first time
 
 // GET request function
-
-const fetchWeatherData = async (zipCode, units) => {
-    const res = await fetch(`/fetchWeatherData?zip=${zipCode}&units=${units}`);
+const fetchWeatherData = async (latitude, longitude) => {
+    const res = await fetch(`/fetchWeatherData?lat=${latitude}&lon=${longitude}`);
     try {
       const data = await res.json();
       return data;
     } catch (error) {
       console.log('error', error);
     }
-  }
-
-
-// POST request function
-const saveData = async(url='/saveData',data={})=>{
-    const res = await fetch(url, {
-        method: 'POST', 
-        credentials: 'same-origin', 
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),      
-      })
-    try{
-        const newData = await res.json();
-        return newData;
-    }
-    catch(error){
-        console.log('error', error);
-    }
-};
-
-const clearData = async(url='/clearData') => {
-  try {
-    const response = await fetch(url, {
-      method: 'DELETE',
-    });
-
-    if (response.ok) {
-      console.log('Data cleared successfully');
-    } else {
-      console.log('Failed to clear data');
-    }
-  } catch (error) {
-    console.error('Error:', error);
-  }
 }
