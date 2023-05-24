@@ -58,7 +58,6 @@ selectElement.addEventListener('change', handleUnitsChange);
 
 const updateUI = async() => {
     try{
-        handleUnitsChange();
         const transaction = db.transaction(["weatherData"], "readonly");
         const objectStore = transaction.objectStore("weatherData");
         const request = objectStore.getAll();
@@ -133,7 +132,7 @@ request.onupgradeneeded = function(event) {
 
 // GET request function
 const fetchWeatherData = async (zipCode, units) => {
-    const res = await fetch(`/fetchWeatherData?zip=${zipCode}&units=${units}`);
+    const res = await fetch(`/fetchWeatherData?zip=${zipCode}`);
     try {
       const data = await res.json();
       return data;

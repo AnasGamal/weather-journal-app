@@ -39,7 +39,7 @@ app.use(express.static('src/'));
 // GET method route
 app.get('/getWeatherData', (req, res)=>{
     console.log(projectData);
-res.send(projectData);
+    res.send(projectData);
 });
 
 // POST method route
@@ -58,7 +58,7 @@ const fetchWeatherData = async(req)=>{
   const zipCode = req.query.zip;
   const units = req.query.units;
   const apiKey = process.env.OPEN_WEATHER_API_KEY;
-  let weatherAPIurl = `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode}&units=${units}&apiKey=${apiKey}`;
+  let weatherAPIurl = `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode}&apiKey=${apiKey}`;
   const res = await fetch(weatherAPIurl);
   try{
       const data = await res.json();
