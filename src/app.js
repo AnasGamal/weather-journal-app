@@ -1,5 +1,5 @@
 /* Global Variables */
-let convertUnits;
+let convertUnits = "metric";
 let isUIUpdated = false;
 let db;
 
@@ -8,7 +8,6 @@ const selectElement = document.getElementById('units');
 const entryHolder = document.getElementById('entryHolder');
 const generateButton = document.getElementById('generate');
 const clearButton = document.getElementById('confirmClear');
-
 
 // Create a new date instance dynamically with JS
 let currentDate = new Date();
