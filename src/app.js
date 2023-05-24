@@ -4,6 +4,7 @@ let isUIUpdated = false;
 // UI
 const entryHolder = document.getElementById('entryHolder');
 const generateButton = document.getElementById('generate');
+const clearButton = document.getElementById('confirmClear');
 
 // Create a new date instance dynamically with JS
 let currentDate = new Date();
@@ -18,8 +19,15 @@ const handleGenerateButtonClick = async () => {
     updateUI();
   }
   
+  
+const handleClearButtonClick = async () => {
+  await clearData();
+  isUIUpdated = false;
+  updateUI();
+}
 
 generateButton.addEventListener('click', handleGenerateButtonClick);
+clearButton.addEventListener('click', handleClearButtonClick);
 
 // Update user UI elements
 const updateUI = async() => {
@@ -104,3 +112,18 @@ const saveData = async(url='/saveData',data={})=>{
     }
 };
 
+const clearData = async(url='/clearData') => {
+  try {
+    const response = await fetch(url, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      console.log('Data cleared successfully');
+    } else {
+      console.log('Failed to clear data');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
