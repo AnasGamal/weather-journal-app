@@ -80,4 +80,9 @@ app.get('/fetchWeatherData', async (req, res) => {
   }
 });
 
+app.delete('/clearData', (req, res) => {
+  projectData = []; // Clear the projectData array
+  res.send('Data cleared successfully');
+});
+
 app.listen(port, () => console.log(`app listening on port ${port}!`));
