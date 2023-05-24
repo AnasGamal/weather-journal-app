@@ -4,6 +4,9 @@ let isUIUpdated = false;
 let db;
 let latitude;
 let longitude;
+let dateOptions = { month: 'long', day: 'numeric', year: 'numeric' };
+let timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true, timeZoneName: 'short' };
+
 
 // UI Elements
 const uiElements = {
@@ -13,10 +16,6 @@ const uiElements = {
     clearButton: document.getElementById('confirmClear'),
     locationButton: document.getElementById('getLocation')
 }
-
-// Create a new date instance
-let currentDate = new Date();
-let formattedDate = `${currentDate.getMonth()+1}/${currentDate.getDate()}/${currentDate.getFullYear()}`;
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -85,13 +84,16 @@ const handleUnitsChange = async () => {
 const handleGenerateButtonClick = async () => {
     try {
     let feelings = document.getElementById('feelings').value;
+    let currentDate = new Date();
+    let date = getCurrentDate(currentDate);
+    let time = getCurrentTime(currentDate);
     if (latitude === undefined || longitude === undefined) {
     await handleLocationButtonClick();
     }
     const apiData = await fetchWeatherData(latitude, longitude);
     const newData = {
         temp: apiData.main.temp,
-        date: formattedDate,
+        date: date,
         content: feelings
     }
     const transaction = db.transaction(["weatherData"], "readwrite");
@@ -151,28 +153,39 @@ const updateEntry = (weatherData) => {
     isUIUpdated = true;
 }
 
+const getCurrentDate = (dateInstance) => new Intl.DateTimeFormat('en-US', dateOptions).format(dateInstance);
+const getCurrentTime = (dateInstance) => new Intl.DateTimeFormat('en-US', timeOptions).format(dateInstance);
+
 // UI Helper Functions
 const createEntryContainer = (date,kelvin,content) => {
     const entryDiv = document.createElement('div');
     entryDiv.classList.add('entryDiv');
-    entryDiv.innerHTML = `
-    ${dateElement(date)}
-    ${temperatureElement(kelvin)}
-    ${feelingsElement(content)}
-    `;
+    const entryMeta = document.createElement('p');
+    entryMeta.classList.add('entryMeta');
+    entryMeta.innerHTML = `${entryInfoElement(date, kelvin)}`
+    const entryContent = document.createElement('p');
+    entryContent.classList.add('entryContent');
+    entryContent.innerHTML = `${feelingsElement(content)}`
+    entryDiv.appendChild(entryMeta)
+    entryDiv.appendChild(entryContent);
     uiElements.entryHolder.prepend(entryDiv);
 }
-
-const feelingsElement = (content) => `<div>Feelings: ${content}</div>`
-const dateElement = (date) => `<div>Date: ${date}</div>`
+const entryInfoElement = (date, kelvin) => {
+    return `${dateElement(date)} | ${temperatureElement(kelvin)}`;
+}
+const feelingsElement = (content) => `<p>${content}</p>`
+const dateElement = (date) => `<span>${date}</span>`
 const temperatureElement = (kelvin) => {
     if (convertUnits === "metric") {
         const metric = Math.round(kelvin - 273.15)
-        return `<div>Temperature: ${metric}°C</div>`;
+        return `<span>Temperature: ${metric}°C</span>`;
     }  
-    else {
+    else if (convertUnits === "imperial"){
         const imperial = (Math.round(kelvin - 273.15) * 9 / 5 + 32);
-        return `<div>Temperature: ${imperial}°F</div>`;
+        return `<span>Temperature: ${imperial}°F</span>`;
+    }
+    else {
+        return
     }
 }
 
