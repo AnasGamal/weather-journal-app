@@ -1,5 +1,5 @@
 // Global Variables
-let convertUnits = "metric";
+let convertUnits;
 let isUIUpdated = false;
 let db;
 let latitude;
@@ -16,6 +16,8 @@ const uiElements = {
     clearButton: document.getElementById('clear'),
     locationButton: document.getElementById('getLocation')
 }
+
+convertUnits = uiElements.selectElement.options[uiElements.selectElement.selectedIndex].value;
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -75,8 +77,7 @@ const handleLocationButtonClick = async () => {
 }
 
 const handleUnitsChange = async () => {
-    const selectedOption = uiElements.selectElement.options[uiElements.selectElement.selectedIndex];
-    convertUnits = selectedOption.value;  
+    convertUnits = uiElements.selectElement.options[uiElements.selectElement.selectedIndex].value;  
     isUIUpdated = false;
     updateUI();
 }
