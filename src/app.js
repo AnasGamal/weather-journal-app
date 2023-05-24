@@ -50,7 +50,11 @@ const updateUI = async() => {
    const updateEntry = (weatherData) => {
     if (weatherData.length === 0) {
         const entryDiv = document.createElement('div');
-        entryDiv.textContent = 'No entries yet.';
+        entryDiv.innerHTML = `
+        <div id="entryContainer" class="max-w-full h-36 mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow mt-4 overflow-auto">
+        <div>No entries yet.</div>
+        </div>
+        `;
         entryHolder.prepend(entryDiv);
     } else {
     weatherData.forEach(entry => {
@@ -58,18 +62,13 @@ const updateUI = async() => {
         const entryDiv = document.createElement('div');
         entryDiv.classList.add('entryDiv');
 
-        // create date div element
-        const dateElement = document.createElement('div', `Date: ${entry.date}`);
-        dateElement.textContent= `Date: ${entry.date}`;   
-         // create temperature div element 
-        const tempElement = document.createElement('div');
-        tempElement.textContent= `Tempreture: ${Math.round(entry.temp)}°C`;
-         // create content div element
-         const contentElement = document.createElement('div');
-        contentElement.textContent= `Feelings: ${entry.content}`;
-
-        // append created elements to created div container
-        entryDiv.append(dateElement, tempElement, contentElement);
+        entryDiv.innerHTML = `
+        <div id="entryContainer" class="max-w-full h-36 mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow mt-4 overflow-auto">
+        <div>Date: ${entry.date}</div>
+        <div>Temperature: ${Math.round(entry.temp)}°C</div>
+        <div>Feelings: ${entry.content}</div>
+        </div>
+        `;
 
         // add new entry to the beginning of entryHolder container
         entryHolder.prepend(entryDiv);
