@@ -26,19 +26,39 @@ const getLocation = () => {
             const options = {
                 enableHighAccuracy: true,
             };
-            
-            // Pass options object as second parameter to getCurrentPosition
-            navigator.geolocation.getCurrentPosition(position => {
-                latitude = position.coords.latitude;
-                longitude = position.coords.longitude;
-                resolve();
-            }, reject, options);
+
+            // Pass options object as the second parameter to getCurrentPosition
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    latitude = position.coords.latitude;
+                    longitude = position.coords.longitude;
+                    resolve();
+                },
+                error => {
+                    reject(getGeolocationErrorMessage(error));
+                },
+                options
+            );
         } else {
             reject("Geolocation is not supported by this browser.");
         }
     });
 }
 
+const getGeolocationErrorMessage = error => {
+    switch (error.code) {
+        case error.PERMISSION_DENIED:
+            return "User denied the request for Geolocation.";
+        case error.POSITION_UNAVAILABLE:
+            return "Location information is unavailable.";
+        case error.TIMEOUT:
+            return "The request to get user location timed out.";
+        case error.UNKNOWN_ERROR:
+            return "An unknown error occurred.";
+        default:
+            return "Error occurred while fetching geolocation.";
+    }
+};
 
 const handleLocationButtonClick = async () => {
     try {
