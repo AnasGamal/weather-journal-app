@@ -13,7 +13,7 @@ const uiElements = {
     selectElement: document.getElementById('units'),
     entryHolder: document.getElementById('entryHolder'),
     generateButton: document.getElementById('generate'),
-    clearButton: document.getElementById('confirmClear'),
+    clearButton: document.getElementById('clear'),
     locationButton: document.getElementById('getLocation')
 }
 
