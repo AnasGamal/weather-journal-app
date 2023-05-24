@@ -67,23 +67,24 @@ const updateUI = async() => {
 const updateEntry = (weatherData) => {
     if (weatherData.length === 0) {
         const entryDiv = document.createElement('div');
-        entryDiv.textContent = 'No entries yet.';
+        entryDiv.innerHTML = `
+        <div id="entryContainer" class="max-w-full h-36 mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow mt-4 overflow-auto">
+        <div>No entries yet.</div>
+        </div>
+        `;
         entryHolder.prepend(entryDiv);
     } else {
         weatherData.forEach(entry => {
             const entryDiv = document.createElement('div');
             entryDiv.classList.add('entryDiv');
 
-            const dateElement = document.createElement('div');
-            dateElement.textContent= `Date: ${entry.date}`;
-
-            const tempElement = document.createElement('div');
-            tempElement.textContent= `Tempreture: ${Math.round(entry.temp)}°C`;
-
-            const contentElement = document.createElement('div');
-            contentElement.textContent= `Feelings: ${entry.content}`;
-
-            entryDiv.append(dateElement, tempElement, contentElement);
+            entryDiv.innerHTML = `
+            <div id="entryContainer" class="max-w-full h-36 mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow mt-4 overflow-auto">
+            <div>Date: ${entry.date}</div>
+            <div>Temperature: ${Math.round(entry.temp)}°C</div>
+            <div>Feelings: ${entry.content}</div>
+            </div>
+            `;
             entryHolder.prepend(entryDiv);
         });
     }
