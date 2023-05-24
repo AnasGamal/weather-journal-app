@@ -26,6 +26,19 @@ uiElements.clearButton.addEventListener('click', handleClearButtonClick);
 uiElements.selectElement.addEventListener('change', handleUnitsChange);
 });
 
+// IndexedDB setup
+const request = indexedDB.open("weatherDB", 1);
+request.onerror = event => console.log('Database error:', event.target.error);
+request.onsuccess = event => {
+    db = request.result;
+    updateUI(); 
+};
+request.onupgradeneeded = event => {
+    let db = event.target.result;
+    let objectStore = db.createObjectStore("weatherData", {autoIncrement: true});
+};
+
+// Function definitions
 const getLocation = () => {
     return new Promise((resolve, reject) => {
         if (!confirm("We need your location to provide weather data. Do you allow us to access your location?")) {
@@ -70,6 +83,7 @@ const handleUnitsChange = async () => {
 }
 
 const handleGenerateButtonClick = async () => {
+    try {
     let feelings = document.getElementById('feelings').value;
     if (latitude === undefined || longitude === undefined) {
     await handleLocationButtonClick();
@@ -85,6 +99,9 @@ const handleGenerateButtonClick = async () => {
     objectStore.add(newData);
     isUIUpdated = false;
     updateUI();
+    } catch(error) {
+        console.log(error);
+    }
 }
 
 const handleClearButtonClick = async () => {
@@ -93,7 +110,7 @@ const handleClearButtonClick = async () => {
     const request = objectStore.clear();
     request.onsuccess = () => {
         // Clear the UI entries as well
-        entryHolder.innerHTML = '';
+        uiElements.entryHolder.innerHTML = '';
         isUIUpdated = false;
         updateUI();
     }
@@ -110,7 +127,7 @@ const updateUI = async() => {
         request.onsuccess = () => {
             if (!isUIUpdated) {
                 // call a function that loops through array and render elements
-                entryHolder.innerHTML = '';
+                uiElements.entryHolder.innerHTML = '';
                 updateEntry(request.result);
             }
         }
@@ -128,7 +145,7 @@ const updateEntry = (weatherData) => {
         <div>No entries yet.</div>
         </div>
         `;
-        entryHolder.prepend(entryDiv);
+        uiElements.entryHolder.prepend(entryDiv);
     } else {
         weatherData.forEach(entry => {
             createEntryContainer(entry.date,entry.temp,entry.content)
@@ -136,6 +153,8 @@ const updateEntry = (weatherData) => {
     }
     isUIUpdated = true;
 }
+
+// UI Helper Functions
 const createEntryContainer = (date,kelvin,content) => {
     const entryDiv = document.createElement('div');
     entryDiv.classList.add('entryDiv');
@@ -146,7 +165,7 @@ const createEntryContainer = (date,kelvin,content) => {
     ${feelingsElement(content)}
     </div>
     `;
-    entryHolder.prepend(entryDiv);
+    uiElements.entryHolder.prepend(entryDiv);
 }
 
 const feelingsElement = (content) => `<div>Feelings: ${content}</div>`
@@ -161,24 +180,13 @@ const temperatureElement = (kelvin) => {
         return `<div>Temperature: ${imperial}°F</div>`;
     }
 }
-// IndexedDB setup
-const request = indexedDB.open("weatherDB", 1);
-request.onerror = function(event) {
-};
-request.onsuccess = function(event) {
-    db = request.result;
-    updateUI(); 
-};
-request.onupgradeneeded = function(event) {
-    let db = event.target.result;
-    let objectStore = db.createObjectStore("weatherData", {autoIncrement: true});
-};
-
-// update the UI for the first time
 
 // GET request function
 const fetchWeatherData = async (latitude, longitude) => {
     const res = await fetch(`/fetchWeatherData?lat=${latitude}&lon=${longitude}`);
+    if (!res.ok) {
+        throw new Error(`HTTP error!: ${res.status}`)
+    }
     try {
       const data = await res.json();
       return data;
