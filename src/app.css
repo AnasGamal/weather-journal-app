@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .entryHolder {
-    @apply max-w-full h-96 mx-auto overflow-auto;
+    @apply max-w-full max-h-96 overflow-auto;
 }
 .entryDiv {
     @apply max-w-full w-[calc(100%-2rem)] h-36 mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow mt-4 overflow-auto text-sm;
