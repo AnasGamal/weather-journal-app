@@ -2,16 +2,51 @@
 let convertUnits = "metric";
 let isUIUpdated = false;
 let db;
+let latitude;
+let longitude;
 
 // UI
 const selectElement = document.getElementById('units');
 const entryHolder = document.getElementById('entryHolder');
 const generateButton = document.getElementById('generate');
 const clearButton = document.getElementById('confirmClear');
+const locationButton = document.getElementById('getLocation');
+
 
 // Create a new date instance dynamically with JS
 let currentDate = new Date();
 let formattedDate = `${currentDate.getMonth()+1}/${currentDate.getDate()}/${currentDate.getFullYear()}`;
+
+const getLocation = () => {
+    return new Promise((resolve, reject) => {
+        if (!confirm("We need your location to provide weather data. Do you allow us to access your location?")) {
+            reject("User did not allow access to location.");
+        } else if (navigator.geolocation) {
+            // Define options object with enableHighAccuracy set to true
+            const options = {
+                enableHighAccuracy: true,
+            };
+            
+            // Pass options object as second parameter to getCurrentPosition
+            navigator.geolocation.getCurrentPosition(position => {
+                latitude = position.coords.latitude;
+                longitude = position.coords.longitude;
+                resolve();
+            }, reject, options);
+        } else {
+            reject("Geolocation is not supported by this browser.");
+        }
+    });
+}
+
+
+const handleLocationButtonClick = async () => {
+    try {
+        await getLocation();
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 const handleUnitsChange = async () => {
     const selectedOption = selectElement.options[selectElement.selectedIndex];
@@ -21,9 +56,11 @@ const handleUnitsChange = async () => {
 }
 
 const handleGenerateButtonClick = async () => {
-    let zipCode = document.getElementById('zip').value;
     let feelings = document.getElementById('feelings').value;
-    const apiData = await fetchWeatherData(zipCode, units);
+    if (latitude === undefined || longitude === undefined) {
+    await handleLocationButtonClick();
+    }
+    const apiData = await fetchWeatherData(latitude, longitude);
     const newData = {
         temp: apiData.main.temp,
         date: formattedDate,
@@ -52,6 +89,7 @@ const handleClearButtonClick = async () => {
 }
 
 generateButton.addEventListener('click', handleGenerateButtonClick);
+locationButton.addEventListener('click', handleLocationButtonClick);
 clearButton.addEventListener('click', handleClearButtonClick);
 selectElement.addEventListener('change', handleUnitsChange);
 
@@ -130,8 +168,8 @@ request.onupgradeneeded = function(event) {
 // update the UI for the first time
 
 // GET request function
-const fetchWeatherData = async (zipCode, units) => {
-    const res = await fetch(`/fetchWeatherData?zip=${zipCode}`);
+const fetchWeatherData = async (latitude, longitude) => {
+    const res = await fetch(`/fetchWeatherData?lat=${latitude}&lon=${longitude}`);
     try {
       const data = await res.json();
       return data;

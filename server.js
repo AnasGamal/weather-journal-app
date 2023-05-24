@@ -55,11 +55,12 @@ app.post('/saveData', (req, res)=>{
   );
 
 const fetchWeatherData = async(req)=>{
-  const zipCode = req.query.zip;
-  const units = req.query.units;
+  const latitude = req.query.lat;
+  const longitude = req.query.lon;
   const apiKey = process.env.OPEN_WEATHER_API_KEY;
-  let weatherAPIurl = `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode}&apiKey=${apiKey}`;
+  let weatherAPIurl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&apiKey=${apiKey}`;
   const res = await fetch(weatherAPIurl);
+  console.log(res);
   try{
       const data = await res.json();
       return data;
@@ -71,6 +72,7 @@ const fetchWeatherData = async(req)=>{
 app.get('/fetchWeatherData', async (req, res) => {
   try {
     const weatherData = await fetchWeatherData(req);
+    console.log(weatherData);
     res.send(weatherData);
   } catch (error) {
     console.log('error', error);
