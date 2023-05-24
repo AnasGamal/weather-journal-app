@@ -140,11 +140,8 @@ const updateUI = async() => {
 const updateEntry = (weatherData) => {
     if (weatherData.length === 0) {
         const entryDiv = document.createElement('div');
-        entryDiv.innerHTML = `
-        <div id="entryContainer" class="max-w-full h-36 mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow mt-4 overflow-auto">
-        <div>No entries yet.</div>
-        </div>
-        `;
+        entryDiv.classList.add('entryDiv');
+        entryDiv.textContent = "No entries yet.";
         uiElements.entryHolder.prepend(entryDiv);
     } else {
         weatherData.forEach(entry => {
@@ -159,11 +156,9 @@ const createEntryContainer = (date,kelvin,content) => {
     const entryDiv = document.createElement('div');
     entryDiv.classList.add('entryDiv');
     entryDiv.innerHTML = `
-    <div id="entryContainer" class="max-w-full h-36 mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow mt-4 overflow-auto">
     ${dateElement(date)}
     ${temperatureElement(kelvin)}
     ${feelingsElement(content)}
-    </div>
     `;
     uiElements.entryHolder.prepend(entryDiv);
 }
