@@ -1,16 +1,25 @@
 /* Global Variables */
-const units = 'metric';
+let convertUnits;
 let isUIUpdated = false;
 let db;
 
 // UI
+const selectElement = document.getElementById('units');
 const entryHolder = document.getElementById('entryHolder');
 const generateButton = document.getElementById('generate');
 const clearButton = document.getElementById('confirmClear');
 
+
 // Create a new date instance dynamically with JS
 let currentDate = new Date();
 let formattedDate = `${currentDate.getMonth()+1}/${currentDate.getDate()}/${currentDate.getFullYear()}`;
+
+const handleUnitsChange = async () => {
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    convertUnits = selectedOption.value;  
+    isUIUpdated = false;
+    updateUI();
+}
 
 const handleGenerateButtonClick = async () => {
     let zipCode = document.getElementById('zip').value;
@@ -45,9 +54,11 @@ const handleClearButtonClick = async () => {
 
 generateButton.addEventListener('click', handleGenerateButtonClick);
 clearButton.addEventListener('click', handleClearButtonClick);
+selectElement.addEventListener('change', handleUnitsChange);
 
 const updateUI = async() => {
     try{
+        handleUnitsChange();
         const transaction = db.transaction(["weatherData"], "readonly");
         const objectStore = transaction.objectStore("weatherData");
         const request = objectStore.getAll();
@@ -81,7 +92,7 @@ const updateEntry = (weatherData) => {
             entryDiv.innerHTML = `
             <div id="entryContainer" class="max-w-full h-36 mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow mt-4 overflow-auto">
             <div>Date: ${entry.date}</div>
-            <div>Temperature: ${Math.round(entry.temp)}°C</div>
+            ${temperatureElement(entry.temp)}
             <div>Feelings: ${entry.content}</div>
             </div>
             `;
@@ -90,7 +101,16 @@ const updateEntry = (weatherData) => {
     }
     isUIUpdated = true;
 }
-
+const temperatureElement = (kelvin) => {
+    if (convertUnits === "metric") {
+        const metric = Math.round(kelvin - 273.15)
+        return `<div>Temperature: ${metric}°C</div>`;
+    }  
+    else {
+        const imperial = (Math.round(kelvin - 273.15) * 9 / 5 + 32);
+        return `<div>Temperature: ${imperial}°F</div>`;
+    }
+}
 // IndexedDB setup
 const request = indexedDB.open("weatherDB", 1);
 request.onerror = function(event) {
