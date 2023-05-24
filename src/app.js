@@ -1,7 +1,8 @@
 /* Global Variables */
-const units = 'metric';
+let convertUnits;
 let isUIUpdated = false;
 // UI
+const selectElement = document.getElementById('units');
 const entryHolder = document.getElementById('entryHolder');
 const generateButton = document.getElementById('generate');
 const clearButton = document.getElementById('confirmClear');
@@ -9,6 +10,13 @@ const clearButton = document.getElementById('confirmClear');
 // Create a new date instance dynamically with JS
 let currentDate = new Date();
 let formattedDate = `${currentDate.getMonth()+1}/${currentDate.getDate()}/${currentDate.getFullYear()}`; // Get current date at time of request
+
+const handleUnitsChange = async () => {
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    convertUnits = selectedOption.value;  
+    isUIUpdated = false;
+    updateUI();
+}
 
 const handleGenerateButtonClick = async () => {
     let zipCode = document.getElementById('zip').value;
@@ -28,6 +36,7 @@ const handleClearButtonClick = async () => {
 
 generateButton.addEventListener('click', handleGenerateButtonClick);
 clearButton.addEventListener('click', handleClearButtonClick);
+selectElement.addEventListener('change', handleUnitsChange);
 
 // Update user UI elements
 const updateUI = async() => {
@@ -57,24 +66,37 @@ const updateUI = async() => {
         `;
         entryHolder.prepend(entryDiv);
     } else {
-    weatherData.forEach(entry => {
-        // create a div container for entry contents
-        const entryDiv = document.createElement('div');
-        entryDiv.classList.add('entryDiv');
-
-        entryDiv.innerHTML = `
-        <div id="entryContainer" class="max-w-full h-36 mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow mt-4 overflow-auto">
-        <div>Date: ${entry.date}</div>
-        <div>Temperature: ${Math.round(entry.temp)}°C</div>
-        <div>Feelings: ${entry.content}</div>
-        </div>
-        `;
-
-        // add new entry to the beginning of entryHolder container
-        entryHolder.prepend(entryDiv);
-      })};
-      isUIUpdated = true;
+        weatherData.forEach(entry => {
+            createEntryContainer(entry.date,entry.temp,entry.content)
+        });
     }
+    isUIUpdated = true;
+}
+const createEntryContainer = (date,kelvin,content) => {
+    const entryDiv = document.createElement('div');
+    entryDiv.classList.add('entryDiv');
+    entryDiv.innerHTML = `
+    <div id="entryContainer" class="max-w-full h-36 mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow mt-4 overflow-auto">
+    ${dateElement(date)}
+    ${temperatureElement(kelvin)}
+    ${feelingsElement(content)}
+    </div>
+    `;
+    entryHolder.prepend(entryDiv);
+}
+
+const feelingsElement = (content) => `<div>Feelings: ${content}</div>`
+const dateElement = (date) => `<div>Date: ${date}</div>`
+const temperatureElement = (kelvin) => {
+    if (convertUnits === "metric") {
+        const metric = Math.round(kelvin - 273.15)
+        return `<div>Temperature: ${metric}°C</div>`;
+    }  
+    else {
+        const imperial = (Math.round(kelvin - 273.15) * 9 / 5 + 32);
+        return `<div>Temperature: ${imperial}°F</div>`;
+    }
+}
 
     // update the UI for the first time
     updateUI();

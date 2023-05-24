@@ -13,12 +13,22 @@
       <div class="holder headline text-4xl font-bold text-center text-gray-800">
           Welcome back to the Weather Journal!
       </div>
-      <div class="holder zip mt-4 flex items-center justify-center">
-        <label for="zip" class="text-lg  font-medium text-gray-700 mr-2">Enter your ZIP Code:</label>
-        <div class="w-auto">
-          <input type="text" id="zip" placeholder="E.g., 12345" class="border rounded border-gray-200 p-2 bg-white text-gray-800 placeholder-gray-400 shadow">
-        </div>
-      </div>
+       <!-- dropdown menu div container -->
+       <div class="holder zip mt-4 flex items-center justify-center">
+      
+        <select id="units" class="bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block  p-2.5">
+          <option value ="metric" selected>Metric</option>
+          <option value="imperial">Imperial</option>
+        </select>
+        
+              </div>
+               <!-- zip code input div container -->
+              <div class="holder zip mt-4 flex items-center justify-center">
+                <label for="zip" class="text-lg  font-medium text-gray-700 mr-2">Enter your ZIP Code:</label>
+                <div class="w-auto">
+                  <input type="text" id="zip" placeholder="E.g., 12345" class="border rounded border-gray-200 p-2 bg-white text-gray-800 placeholder-gray-400 shadow">
+                </div>
+              </div>
     
       <div class="holder feel mt-4 text-center">
           <label for="feelings" class="text-lg font-medium text-gray-700">How are you feeling today?</label>
