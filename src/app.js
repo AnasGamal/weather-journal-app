@@ -14,7 +14,10 @@ const uiElements = {
     entryHolder: document.getElementById('entryHolder'),
     generateButton: document.getElementById('generate'),
     clearButton: document.getElementById('clear'),
-    locationButton: document.getElementById('getLocation')
+    locationButton: document.getElementById('getLocation'),
+    exportButton: document.getElementById('export'),
+    importButton: document.getElementById('import'),
+    fileInputButton: document.getElementById('fileInput'),
 }
 
 convertUnits = uiElements.selectElement.options[uiElements.selectElement.selectedIndex].value;
@@ -25,6 +28,9 @@ uiElements.generateButton.addEventListener('click', handleGenerateButtonClick);
 uiElements.locationButton.addEventListener('click', handleLocationButtonClick);
 uiElements.clearButton.addEventListener('click', handleClearButtonClick);
 uiElements.selectElement.addEventListener('change', handleUnitsChange);
+uiElements.exportButton.addEventListener('click', handleExportButtonClick);
+uiElements.importButton.addEventListener('click', handleImportButtonClick);
+uiElements.fileInputButton.addEventListener('change', handleImportFileChange);
 });
 
 // IndexedDB setup
@@ -37,9 +43,104 @@ request.onsuccess = event => {
 request.onupgradeneeded = event => {
     let db = event.target.result;
     let objectStore = db.createObjectStore("weatherData", {autoIncrement: true});
+    objectStore.createIndex("date", "date", {unique: false});
+    objectStore.createIndex("temp", "temp", {unique: false});
+    objectStore.createIndex("content", "content", {unique: false});
 };
 
 // Function definitions
+const handleImportButtonClick = () => {
+    // Trigger the file input selection
+    uiElements.fileInputButton.click();
+  }
+
+const handleExportButtonClick = () => {
+    const transaction = db.transaction("weatherData", "readonly");
+    const objectStore = transaction.objectStore("weatherData");
+    const request = objectStore.getAll();
+    request.onsuccess = event => {
+        const data = event.target.result;
+        const dataString = JSON.stringify(data);
+        const blob = new Blob([dataString], {type: "application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = "weatherData.json";
+        a.click();
+        a.remove();
+    }
+}
+
+const handleImportFileChange = (event) => {
+    const file = event.target.files[0];
+  
+    // Create a file reader to read the imported file
+    const reader = new FileReader();
+    reader.onload = () => {
+      const importedData = reader.result; // Use reader.result to access the imported data
+      try {
+        // Parse the imported data as JSON
+        const data = JSON.parse(importedData);
+  
+        // Clear the existing data in IndexedDB
+        const transaction = db.transaction(["weatherData"], "readwrite");
+        const objectStore = transaction.objectStore("weatherData");
+        const clearRequest = objectStore.clear();
+  
+        clearRequest.onsuccess = () => {
+          // Add the imported data to IndexedDB
+          data.forEach((entry) => {
+            objectStore.add(entry);
+          });
+  
+          // Update the UI to display the imported data
+          isUIUpdated = false;
+          updateUI();
+        };
+  
+        clearRequest.onerror = (event) => {
+          console.log('Error clearing data:', event.target.error);
+        };
+      } catch (error) {
+        console.log('Error importing data:', error);
+      }
+    };
+  
+    // Read the file as text
+    reader.readAsText(file);
+  };  
+
+  const handleImportFileLoad = (event) => {
+    const importedData = event.target.result;
+    
+    try {
+      // Parse the imported data as JSON
+      const data = JSON.parse(importedData);
+      
+      // Clear the existing data in IndexedDB
+      const transaction = db.transaction(["weatherData"], "readwrite");
+      const objectStore = transaction.objectStore("weatherData");
+      const clearRequest = objectStore.clear();
+      
+      clearRequest.onsuccess = () => {
+        // Add the imported data to IndexedDB
+        data.forEach((entry) => {
+          objectStore.add(entry);
+        });
+        
+        // Update the UI to display the imported data
+        isUIUpdated = false;
+        updateUI();
+      };
+      
+      clearRequest.onerror = (event) => {
+        console.log('Error clearing data:', event.target.error);
+      };
+    } catch (error) {
+      console.log('Error importing data:', error);
+    }
+  };
+
 const getLocation = () => {
     return new Promise((resolve, reject) => {
         if (!confirm("We need your location to provide weather data. Do you allow us to access your location?")) {
