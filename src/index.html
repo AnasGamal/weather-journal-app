@@ -26,7 +26,7 @@
             <div class="flex justify-center space-x-4 mt-4">
                 <!-- Units dropdown -->
                 <div class="holder zip flex items-center justify-center">
-                    <select id="units" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                  <select id="units" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-full focus:ring-blue-500 focus:border-blue-500 block p-2.5 text-center">
                         <option value="metric" selected>Metric</option>
                         <option value="imperial">Imperial</option>
                     </select>
@@ -75,6 +75,24 @@
             <!-- Journal entries display -->
             <div class="holder entry mt-4 ">
                 <h2 class="title text-2xl font-bold text-gray-800 text-center">Journal</h2>
+                  <!-- Export and import button -->
+                  <div class="flex justify-center space-x-4 mt-4">
+                    <!-- Export button -->
+                    <div class="holder zip flex items-center justify-center">
+                      <button id="export" type="button" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">  
+                        Export
+                    </button>
+                    </div>
+                    <div class="holder zip flex items-center justify-center">
+                      <!-- Add an input element for file selection -->
+                      <input type="file" id="fileInput" style="display:none;">
+
+                      <!-- Update the import button to trigger file selection -->
+                      <button id="import" type="button" class="py-2.5 px-5 mr-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200">  
+                        Import
+                      </button>
+                    </div>
+                </div>
                 <div id="entryHolder" class="entryHolder text-lg text-left text-gray-700"></div>
             </div>      
         </div>
