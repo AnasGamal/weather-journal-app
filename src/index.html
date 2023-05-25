@@ -45,11 +45,15 @@
                 <div>
                     <textarea class="myInput border border-gray-200 rounded p-2 mt-2 bg-white text-gray-800 placeholder-gray-400 shadow w-full" id="feelings" placeholder="Share your thoughts and feelings about the weather, your day, or anything else!" rows="9" cols="50"></textarea>
                 </div>
-                <div class="flex justify-center mt-4">
+                <div class="flex justify-center space-x-4 mt-4">
                     <!-- Add Entry button -->
-                    <button id="generate" type="button" class="mr-2 text-white bg-purple-700 hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-full text-sm px-5 py-2.5 text-center dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Add Entry</button>
+                    <button id="generate" type="button" class="text-white bg-purple-700 hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2">
+                      Add Entry
+                    </button>
                     <!-- Clear button with confirmation modal -->
-                    <button data-modal-target="popup-modal" data-modal-toggle="popup-modal" id="promptClear" type="button" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Clear</button>                    
+                    <button data-modal-target="popup-modal" data-modal-toggle="popup-modal" id="promptClear" type="button" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-full text-sm px-5 py-2.5 mr-2 mb-2">
+                      Clear
+                    </button>                    
                     <!-- Modal for confirming entry clearance -->
                     <div id="popup-modal" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
                       <div class="relative w-full max-w-md max-h-full">
