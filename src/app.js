@@ -1,5 +1,4 @@
 // Global Variables
-let convertUnits;
 let isUIUpdated = false;
 let db;
 let latitude;
@@ -20,18 +19,7 @@ const uiElements = {
     fileInputButton: document.getElementById('fileInput'),
 }
 
-convertUnits = uiElements.selectElement.options[uiElements.selectElement.selectedIndex].value;
-
-// Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-uiElements.generateButton.addEventListener('click', handleGenerateButtonClick);
-uiElements.locationButton.addEventListener('click', handleLocationButtonClick);
-uiElements.clearButton.addEventListener('click', handleClearButtonClick);
-uiElements.selectElement.addEventListener('change', handleUnitsChange);
-uiElements.exportButton.addEventListener('click', handleExportButtonClick);
-uiElements.importButton.addEventListener('click', handleImportButtonClick);
-uiElements.fileInputButton.addEventListener('change', handleImportFileChange);
-});
+let convertUnits = uiElements.selectElement.options[uiElements.selectElement.selectedIndex].value;
 
 // IndexedDB setup
 const request = indexedDB.open("weatherDB", 1);
@@ -192,15 +180,16 @@ const handleGenerateButtonClick = async () => {
     if (latitude === undefined || longitude === undefined) {
     await handleLocationButtonClick();
     }
-    const apiData = await fetchWeatherData(latitude, longitude);
-    const newData = {
-        temp: apiData.main.temp,
+    // Destructuring assignment to get the temperature from the returned object
+    const { main: {temp}} = await fetchWeatherData(latitude, longitude);
+    const journalEntry = {
+        temp, 
         date: date,
         content: feelings
-    }
+    };
     const transaction = db.transaction(["weatherData"], "readwrite");
     const objectStore = transaction.objectStore("weatherData");
-    objectStore.add(newData);
+    objectStore.add(journalEntry);
     isUIUpdated = false;
     updateUI();
     } catch(error) {
@@ -290,6 +279,15 @@ const temperatureElement = (kelvin) => {
         return
     }
 }
+
+// Event Listeners
+uiElements.generateButton.addEventListener('click', handleGenerateButtonClick);
+uiElements.locationButton.addEventListener('click', handleLocationButtonClick);
+uiElements.clearButton.addEventListener('click', handleClearButtonClick);
+uiElements.selectElement.addEventListener('change', handleUnitsChange);
+uiElements.exportButton.addEventListener('click', handleExportButtonClick);
+uiElements.importButton.addEventListener('click', handleImportButtonClick);
+uiElements.fileInputButton.addEventListener('change', handleImportFileChange);
 
 // GET request function
 const fetchWeatherData = async (latitude, longitude) => {
