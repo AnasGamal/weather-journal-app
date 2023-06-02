@@ -1,6 +1,7 @@
 // Setup empty JS object to act as endpoint for all routes
 projectData = [];  
-
+// Requre PlaceKit client library
+const placekit = require('@placekit/client-js');
 // Require Express to run server and routes
 const express = require('express');
 const path = require('path');
@@ -9,6 +10,11 @@ const app = express();
 // load .env file
 require('dotenv').config();
 const port = process.env.PORT || 3000;
+const countries = require('countries');
+const allCountries = countries.all.map((country) => country.alpha2.toLowerCase());
+// Load PlaceKit API Key from environment variables 
+const pk = placekit(process.env.PLACEKIT_API_KEY, { types: ['city'], maxResults: 4, countries: allCountries.join(',')});
+
 let fetch;
 (async () => {
   fetch = (await import('node-fetch')).default;
@@ -21,9 +27,10 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'src', 'index.html'));
 });
 
-
 /* Dependencies */
 const bodyParser = require('body-parser')
+
+
 /* Middleware*/
 //Here we are configuring express to use body-parser as middle-ware.
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -34,7 +41,16 @@ const cors = require('cors');
 app.use(cors());
 // Initialize the main project folder
 app.use(express.static('src/'));
-  
+
+// Autocomplete setup
+app.post('/city', async (req, res) => { try {
+  const results = await pk.search(req.body.query);
+  res.json(results.results);
+  } catch (error) {
+    console.log('error', error);
+    res.status(500).send({error: 'Server error'});
+  }
+});
 
 // GET method route
 app.get('/getWeatherData', (req, res)=>{

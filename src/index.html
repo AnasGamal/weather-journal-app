@@ -38,6 +38,21 @@
                     </button>
                 </div>
             </div>
+
+              <!-- Autocomplete -->
+              <div class="flex justify-center space-x-4 mt-4">
+                <div class="w-96 relative" id="autocompleteContainer">
+                    <input
+                      id="autocompleteInput"
+                      placeholder="Select country name"
+                      class="px-5 py-3 w-full border border-gray-300 rounded-md"
+                    />
+                    <div
+                      id="dropdown"
+                      class="w-full h-60 border border-gray-300 rounded-md bg-white absolute overflow-y-auto z-10 hidden"
+                    ></div>
+                  </div>
+                </div>
             
             <!-- Feelings textarea and action buttons -->
             <div class="holder feel mt-4 text-center">
@@ -97,7 +112,7 @@
                       </button>
                     </div>
                 </div>
-                <div id="entryHolder" class="entryHolder text-lg text-left text-gray-700"></div>
+                <div id="entryHolder" class="entryHolder"></div>
             </div>      
         </div>
     </div>

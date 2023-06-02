@@ -17,6 +17,9 @@ const uiElements = {
     exportButton: document.getElementById('export'),
     importButton: document.getElementById('import'),
     fileInputButton: document.getElementById('fileInput'),
+    autoCompleteContainer: document.getElementById('autocompleteContainer'),
+    autocompleteInput: document.getElementById('autocompleteInput'),
+    dropdownEl: document.getElementById('dropdown'),
 }
 
 let convertUnits = uiElements.selectElement.options[uiElements.selectElement.selectedIndex].value;
@@ -37,10 +40,45 @@ request.onupgradeneeded = event => {
 };
 
 // Function definitions
+
+const handleKeyUp = async (e) => {
+    let query = uiElements.autocompleteInput.value;
+    try {
+    let results = await searchCity(query);
+    console.log(`rendering ${results} results first`);
+    renderOptions(results);
+    } catch (error) {
+    console.log('error', error);
+    }
+}
+
+const renderOptions = (results) => {
+    console.log(`rendering ${results} results second`);
+    let newHtml = ``;
+    results.map(result => {
+      newHtml += `<div
+        onclick="selectOption('${result.city}')"
+        class="px-5 py-3 border-b border-gray-200 text-stone-600 cursor-pointer hover:bg-slate-100 transition-colors"
+      >
+        ${result.city}
+      </div>`;
+    });
+
+    uiElements.dropdownEl.innerHTML = newHtml;
+    uiElements.dropdownEl.classList.remove('hidden');
+}
+
+const selectOption = (name) => {
+    uiElements.autocompleteInput.value = name;
+    hideDropDown();
+}
+
+const hideDropDown = () => uiElements.dropdownEl.classList.add('hidden');
+
 const handleImportButtonClick = () => {
     // Trigger the file input selection
     uiElements.fileInputButton.click();
-  }
+}
 
 const handleExportButtonClick = () => {
     const transaction = db.transaction("weatherData", "readonly");
@@ -288,7 +326,11 @@ uiElements.selectElement.addEventListener('change', handleUnitsChange);
 uiElements.exportButton.addEventListener('click', handleExportButtonClick);
 uiElements.importButton.addEventListener('click', handleImportButtonClick);
 uiElements.fileInputButton.addEventListener('change', handleImportFileChange);
-
+uiElements.autoCompleteContainer.addEventListener('click', (event) => {
+    event.stopImmediatePropagation();
+  });
+uiElements.autocompleteInput.addEventListener('keyup', handleKeyUp);
+  
 // GET request function
 const fetchWeatherData = async (latitude, longitude) => {
     const res = await fetch(`/fetchWeatherData?lat=${latitude}&lon=${longitude}`);
@@ -301,4 +343,27 @@ const fetchWeatherData = async (latitude, longitude) => {
     } catch (error) {
       console.log('error', error);
     }
+}
+
+const searchCity = async (query) => {
+    try {
+        const response = await fetch('/city', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ query: query }),
+        });
+    
+        if (!response.ok) {
+          throw new Error('Request failed with status: ' + response.status);
+        }
+    
+        const data = await response.json();
+        console.log(data);
+        return data;
+      } catch (error) {
+        console.error('Error:', error);
+        throw error;
+      }
 }
