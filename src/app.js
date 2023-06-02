@@ -5,6 +5,9 @@ let latitude;
 let longitude;
 let dateOptions = { month: 'long', day: 'numeric', year: 'numeric' };
 let timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true, timeZoneName: 'short' };
+// TODO: add an error container to the UI
+// TODO: prevent from submitting an empty feelings field
+// TODO: display errors in the error UI container
 
 
 // UI Elements
@@ -23,6 +26,7 @@ const uiElements = {
 }
 
 let convertUnits = uiElements.selectElement.options[uiElements.selectElement.selectedIndex].value;
+let selectedCity = uiElements.autocompleteInput.value;
 
 // IndexedDB setup
 const request = indexedDB.open("weatherDB", 1);
@@ -77,6 +81,7 @@ const renderOptions = (results) => {
 
 const selectOption = (name) => {
     uiElements.autocompleteInput.value = name;
+    selectedCity = name;
     hideDropDown();
 }
 
@@ -196,7 +201,8 @@ const getLocation = () => {
                 },
                 options
             );
-        } else {
+        }
+         else {
             reject("Geolocation is not supported by this browser.");
         }
     });
@@ -222,11 +228,8 @@ const handleGenerateButtonClick = async () => {
     let currentDate = new Date();
     let date = getCurrentDate(currentDate);
     let time = getCurrentTime(currentDate);
-    if (latitude === undefined || longitude === undefined) {
-    await handleLocationButtonClick();
-    }
     // Destructuring assignment to get the temperature from the returned object
-    const { main: {temp}} = await fetchWeatherData(latitude, longitude);
+    const { main: {temp}} = await fetchWeatherData(latitude, longitude, selectedCity);
     const journalEntry = {
         temp, 
         date: date,
@@ -236,6 +239,7 @@ const handleGenerateButtonClick = async () => {
     const objectStore = transaction.objectStore("weatherData");
     objectStore.add(journalEntry);
     isUIUpdated = false;
+    document.getElementById('feelings').value = ''; // reset the input fields
     updateUI();
     } catch(error) {
         console.log(error);
@@ -327,7 +331,7 @@ const temperatureElement = (kelvin) => {
 
 // Event Listeners
 uiElements.generateButton.addEventListener('click', handleGenerateButtonClick);
-uiElements.locationButton.addEventListener('click', handleLocationButtonClick);
+uiElements.locationButton.addEventListener('click', async () => {await handleLocationButtonClick()});
 uiElements.clearButton.addEventListener('click', handleClearButtonClick);
 uiElements.selectElement.addEventListener('change', handleUnitsChange);
 uiElements.exportButton.addEventListener('click', handleExportButtonClick);
@@ -337,10 +341,16 @@ uiElements.autoCompleteContainer.addEventListener('click', (event) => {
     event.stopImmediatePropagation();
   });
 uiElements.autocompleteInput.addEventListener('keyup', handleKeyUp);
-  
+document.addEventListener('click', hideDropDown);
+
 // GET request function
 const fetchWeatherData = async (latitude, longitude) => {
-    const res = await fetch(`/fetchWeatherData?lat=${latitude}&lon=${longitude}`);
+    let res;
+    if (!latitude || !longitude) {
+    res = await fetch(`/fetchWeatherData?city=${selectedCity}`);
+    } else if (latitude && longitude) {
+      res = await fetch(`/fetchWeatherData?lat=${latitude}&lon=${longitude}`);
+    }
     if (!res.ok) {
         throw new Error(`HTTP error!: ${res.status}`)
     }

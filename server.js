@@ -69,10 +69,18 @@ app.post('/saveData', (req, res)=>{
   );
 
 const fetchWeatherData = async(req)=>{
+  let weatherAPIurl;
   const latitude = req.query.lat;
   const longitude = req.query.lon;
+  const city = req.query.city;
   const apiKey = process.env.OPEN_WEATHER_API_KEY;
-  let weatherAPIurl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&apiKey=${apiKey}`;
+  if (latitude && longitude) {
+    weatherAPIurl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&apiKey=${apiKey}`;
+    console.log(weatherAPIurl);
+  } else if (city) {
+    weatherAPIurl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&apiKey=${apiKey}`;
+    console.log(weatherAPIurl);
+  }
   const res = await fetch(weatherAPIurl);
   console.log(res);
   try{
