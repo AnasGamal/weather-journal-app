@@ -43,29 +43,36 @@ request.onupgradeneeded = event => {
 
 const handleKeyUp = async (e) => {
     let query = uiElements.autocompleteInput.value;
+    if (query === '') {
+      hideDropDown();
+    } else {
     try {
     let results = await searchCity(query);
-    console.log(`rendering ${results} results first`);
     renderOptions(results);
     } catch (error) {
     console.log('error', error);
     }
+  }
 }
 
 const renderOptions = (results) => {
-    console.log(`rendering ${results} results second`);
     let newHtml = ``;
+    if (results.length > 0) {
     results.map(result => {
+      let displayedResult = `${result.city}, ${result.country}`;
       newHtml += `<div
-        onclick="selectOption('${result.city}')"
+        onclick="selectOption('${displayedResult}')"
         class="px-5 py-3 border-b border-gray-200 text-stone-600 cursor-pointer hover:bg-slate-100 transition-colors"
       >
-        ${result.city}
+        ${displayedResult}
       </div>`;
     });
 
     uiElements.dropdownEl.innerHTML = newHtml;
     uiElements.dropdownEl.classList.remove('hidden');
+  } else {
+    hideDropDown();
+  }
 }
 
 const selectOption = (name) => {
@@ -360,7 +367,6 @@ const searchCity = async (query) => {
         }
     
         const data = await response.json();
-        console.log(data);
         return data;
       } catch (error) {
         console.error('Error:', error);

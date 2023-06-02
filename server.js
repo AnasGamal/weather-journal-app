@@ -10,10 +10,8 @@ const app = express();
 // load .env file
 require('dotenv').config();
 const port = process.env.PORT || 3000;
-const countries = require('countries');
-const allCountries = countries.all.map((country) => country.alpha2.toLowerCase());
 // Load PlaceKit API Key from environment variables 
-const pk = placekit(process.env.PLACEKIT_API_KEY, { types: ['city'], maxResults: 4, countries: allCountries.join(',')});
+const pk = placekit(process.env.PLACEKIT_API_KEY, { language: 'en', types: ['city'], maxResults: 4, countryByIP: true, countries: ['US']});
 
 let fetch;
 (async () => {
