@@ -60,7 +60,6 @@ const handleKeyUp = async () => {
     let query = uiElements.autocompleteInput.value;
     // indicate that the location is obtained from the search bar and not from the Geolocation API
     locationFromCoords = false;
-    locationFromSearch = true;
     if (query === '') {
       hideDropDown();
       // handle empty city input asynchonously
@@ -70,6 +69,7 @@ const handleKeyUp = async () => {
       searchTimeout = setTimeout(async () => {
     try {
     const results = await searchCity(query);
+    locationFromSearch = true;
     renderOptions(results);
     } catch (error) {
     console.log('error', error);
@@ -82,10 +82,11 @@ const renderOptions = (results) => {
     const dropDownResults = document.createElement('div');
     if (results.length > 0) {
     results.map(result => {
-      let displayedResult = `${result.city}, ${result.country}`;
+      let displayedResult = `${result.city}, ${result.administrative}`;
       const dropDownResult = document.createElement('div');
       dropDownResult.classList.add('dropDownResult');
       dropDownResult.textContent = displayedResult;
+      dropDownResult.addEventListener('click', () => selectOption(displayedResult));
       dropDownResults.appendChild(dropDownResult);
     });
   } else {
@@ -169,7 +170,7 @@ const handleImportFileChange = (event) => {
     reader.readAsText(file);
   };  
 
-  const handleImportFileLoad = (event) => {
+const handleImportFileLoad = (event) => {
     const importedData = event.target.result;
     
     try {
@@ -198,7 +199,7 @@ const handleImportFileChange = (event) => {
     } catch (error) {
       console.log('Error importing data:', error);
     }
-  };
+};
 
 // TODO: Refactor to use modern Promise syntax
 const getLocation = () => {
