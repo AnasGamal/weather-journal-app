@@ -6,12 +6,17 @@
     @apply max-w-full max-h-96 overflow-auto text-lg text-left text-gray-700;
 }
 .entryDiv {
-    @apply max-w-full w-[calc(100%-2rem)] h-36 mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow mt-4 mb-2 overflow-auto text-sm;
+    @apply max-w-full w-[calc(100%-2rem)] h-36 mx-auto p-6 bg-white border border-gray-200 rounded-lg shadow mt-4 mb-2 overflow-auto text-sm divide-y;
 }
 
 .entryMeta {
-@apply font-mono font-bold;
+@apply font-mono font-bold text-gray-500;
 }
+
 .entryContent {
     @apply text-sm;
+}
+
+.dropDownResult {
+    @apply px-5 py-3 border-b border-gray-200 text-stone-600 cursor-pointer hover:bg-slate-100 transition-colors;
 }

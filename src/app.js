@@ -74,23 +74,25 @@ const handleKeyUp = async () => {
 }
 
 const renderOptions = (results) => {
-    let newHtml = ``;
+    const dropDownResults = document.createElement('div');
     if (results.length > 0) {
     results.map(result => {
       let displayedResult = `${result.city}, ${result.country}`;
-      newHtml += `<div
-        onclick="selectOption('${displayedResult}')"
-        class="px-5 py-3 border-b border-gray-200 text-stone-600 cursor-pointer hover:bg-slate-100 transition-colors"
-      >
-        ${displayedResult}
-      </div>`;
+      const dropDownResult = document.createElement('div');
+      dropDownResult.classList.add('dropDownResult');
+      dropDownResult.textContent = displayedResult;
+      dropDownResults.appendChild(dropDownResult);
     });
-
-    uiElements.dropdownEl.innerHTML = newHtml;
-    uiElements.dropdownEl.classList.remove('hidden');
   } else {
-    hideDropDown();
+    const dropDownResult = document.createElement('div');
+    dropDownResult.classList.add('dropDownResult');
+    dropDownResult.textContent = "No results found.";
+    dropDownResults.appendChild(dropDownResult);
   }
+  // make sure the dropdown is empty before appending the new results
+  uiElements.dropdownEl.innerHTML = '';
+  uiElements.dropdownEl.appendChild(dropDownResults);
+  uiElements.dropdownEl.classList.remove('hidden');
 }
 
 const selectOption = (name) => {
