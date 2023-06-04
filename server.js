@@ -73,12 +73,12 @@ const fetchWeatherData = async(req)=>{
   const latitude = req.query.lat;
   const longitude = req.query.lon;
   const city = req.query.city;
-  const apiKey = process.env.OPEN_WEATHER_API_KEY;
+  const openWeatherApiKey = process.env.OPEN_WEATHER_API_KEY;
   if (latitude && longitude) {
-    weatherAPIurl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&apiKey=${apiKey}`;
+    weatherAPIurl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&apiKey=${openWeatherApiKey}`;
     console.log(weatherAPIurl);
   } else if (city) {
-    weatherAPIurl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&apiKey=${apiKey}`;
+    weatherAPIurl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&apiKey=${openWeatherApiKey}`;
     console.log(weatherAPIurl);
   }
   const res = await fetch(weatherAPIurl);

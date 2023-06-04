@@ -3,6 +3,7 @@ let isUIUpdated = false;
 let db;
 let latitude;
 let longitude;
+
 let dateOptions = { month: 'long', day: 'numeric', year: 'numeric' };
 let timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true, timeZoneName: 'short' };
 // TODO: add an error container to the UI
@@ -25,8 +26,16 @@ const uiElements = {
     dropdownEl: document.getElementById('dropdown'),
 }
 
+// Global Variables that depend on the UI
 let convertUnits = uiElements.selectElement.options[uiElements.selectElement.selectedIndex].value;
 let selectedCity = uiElements.autocompleteInput.value;
+let locationFromCoords = false; // Flag to check if the location is obtained from the Geolocation API
+let locationFromSearch; // Flag to check if the location is obtained from the search bar
+
+// If the search bar is not empty at load then the location is obtained from the search bar unless user clicks on the location button
+if (selectedCity !== '') { 
+    locationFromSearch = true;
+} else locationFromSearch = false; 
 
 // IndexedDB setup
 const request = indexedDB.open("weatherDB", 1);
@@ -45,10 +54,15 @@ request.onupgradeneeded = event => {
 
 // Function definitions
 
-const handleKeyUp = async (e) => {
+const handleKeyUp = async () => {
     let query = uiElements.autocompleteInput.value;
+    // indicate that the location is obtained from the search bar and not from the Geolocation API
+    locationFromCoords = false;
+    locationFromSearch = true;
     if (query === '') {
       hideDropDown();
+      // handle empty city input asynchonously
+      locationFromSearch = false;
     } else {
     try {
     let results = await searchCity(query);
@@ -179,6 +193,7 @@ const handleImportFileChange = (event) => {
     }
   };
 
+// TODO: Refactor to use modern Promise syntax
 const getLocation = () => {
     return new Promise((resolve, reject) => {
         if (!confirm("We need your location to provide weather data. Do you allow us to access your location?")) {
@@ -201,6 +216,9 @@ const getLocation = () => {
                 },
                 options
             );
+            // Indicate that the location was obtained from the geolocation API and not from the search input
+            locationFromCoords = true;
+            locationFromSearch = false;
         }
          else {
             reject("Geolocation is not supported by this browser.");
@@ -227,7 +245,17 @@ const handleGenerateButtonClick = async () => {
     let feelings = document.getElementById('feelings').value;
     let currentDate = new Date();
     let date = getCurrentDate(currentDate);
+    // TODO: set up time variable for later integration
     let time = getCurrentTime(currentDate);
+    // TODO: Handle those errors through a better UI 
+    if (!locationFromSearch && !locationFromCoords) {
+      alert ("Please enter a city name or click on the location button to get weather data.");
+      return;
+    }
+    if (feelings === '') {
+      alert ("Please enter your journal entry.");
+      return;
+    }
     // Destructuring assignment to get the temperature from the returned object
     const { main: {temp}} = await fetchWeatherData(latitude, longitude, selectedCity);
     const journalEntry = {
@@ -346,9 +374,9 @@ document.addEventListener('click', hideDropDown);
 // GET request function
 const fetchWeatherData = async (latitude, longitude) => {
     let res;
-    if (!latitude || !longitude) {
+    if (locationFromSearch) {
     res = await fetch(`/fetchWeatherData?city=${selectedCity}`);
-    } else if (latitude && longitude) {
+    } else if (locationFromCoords) {
       res = await fetch(`/fetchWeatherData?lat=${latitude}&lon=${longitude}`);
     }
     if (!res.ok) {
