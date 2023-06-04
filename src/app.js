@@ -3,8 +3,12 @@ let isUIUpdated = false;
 let db;
 let latitude;
 let longitude;
+let searchTimeout;
 let dateOptions = { month: 'long', day: 'numeric', year: 'numeric' };
 let timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true, timeZoneName: 'short' };
+// TODO: add an error container to the UI
+// TODO: prevent from submitting an empty feelings field
+// TODO: display errors in the error UI container
 
 
 // UI Elements
@@ -17,9 +21,21 @@ const uiElements = {
     exportButton: document.getElementById('export'),
     importButton: document.getElementById('import'),
     fileInputButton: document.getElementById('fileInput'),
+    autoCompleteContainer: document.getElementById('autocompleteContainer'),
+    autocompleteInput: document.getElementById('autocompleteInput'),
+    dropdownEl: document.getElementById('dropdown'),
 }
 
+// Global Variables that depend on the UI
 let convertUnits = uiElements.selectElement.options[uiElements.selectElement.selectedIndex].value;
+let selectedCity = uiElements.autocompleteInput.value;
+let locationFromCoords = false; // Flag to check if the location is obtained from the Geolocation API
+let locationFromSearch; // Flag to check if the location is obtained from the search bar
+
+// If the search bar is not empty at load then the location is obtained from the search bar unless user clicks on the location button
+if (selectedCity !== '') { 
+    locationFromSearch = true;
+} else locationFromSearch = false; 
 
 // IndexedDB setup
 const request = indexedDB.open("weatherDB", 1);
@@ -37,10 +53,66 @@ request.onupgradeneeded = event => {
 };
 
 // Function definitions
+
+const handleKeyUp = async () => {
+    clearTimeout(searchTimeout);
+    // TODO: consider using trim() to remove leading and trailing spaces
+    let query = uiElements.autocompleteInput.value;
+    // indicate that the location is obtained from the search bar and not from the Geolocation API
+    locationFromCoords = false;
+    if (query === '') {
+      hideDropDown();
+      // handle empty city input asynchonously
+      locationFromSearch = false;
+    } else {
+      // wait 1 second before making the API call
+      searchTimeout = setTimeout(async () => {
+    try {
+    const results = await searchCity(query);
+    locationFromSearch = true;
+    renderOptions(results);
+    } catch (error) {
+    console.log('error', error);
+    }
+    }, 1000);
+  }
+}
+
+const renderOptions = (results) => {
+    const dropDownResults = document.createElement('div');
+    if (results.length > 0) {
+    results.map(result => {
+      let displayedResult = `${result.city}, ${result.administrative}`;
+      const dropDownResult = document.createElement('div');
+      dropDownResult.classList.add('dropDownResult');
+      dropDownResult.textContent = displayedResult;
+      dropDownResult.addEventListener('click', () => selectOption(displayedResult));
+      dropDownResults.appendChild(dropDownResult);
+    });
+  } else {
+    const dropDownResult = document.createElement('div');
+    dropDownResult.classList.add('dropDownResult');
+    dropDownResult.textContent = "No results found.";
+    dropDownResults.appendChild(dropDownResult);
+  }
+  // make sure the dropdown is empty before appending the new results
+  uiElements.dropdownEl.innerHTML = '';
+  uiElements.dropdownEl.appendChild(dropDownResults);
+  uiElements.dropdownEl.classList.remove('hidden');
+}
+
+const selectOption = (name) => {
+    uiElements.autocompleteInput.value = name;
+    selectedCity = name;
+    hideDropDown();
+}
+
+const hideDropDown = () => uiElements.dropdownEl.classList.add('hidden');
+
 const handleImportButtonClick = () => {
     // Trigger the file input selection
     uiElements.fileInputButton.click();
-  }
+}
 
 const handleExportButtonClick = () => {
     const transaction = db.transaction("weatherData", "readonly");
@@ -98,7 +170,7 @@ const handleImportFileChange = (event) => {
     reader.readAsText(file);
   };  
 
-  const handleImportFileLoad = (event) => {
+const handleImportFileLoad = (event) => {
     const importedData = event.target.result;
     
     try {
@@ -127,8 +199,9 @@ const handleImportFileChange = (event) => {
     } catch (error) {
       console.log('Error importing data:', error);
     }
-  };
+};
 
+// TODO: Refactor to use modern Promise syntax
 const getLocation = () => {
     return new Promise((resolve, reject) => {
         if (!confirm("We need your location to provide weather data. Do you allow us to access your location?")) {
@@ -151,7 +224,11 @@ const getLocation = () => {
                 },
                 options
             );
-        } else {
+            // Indicate that the location was obtained from the geolocation API and not from the search input
+            locationFromCoords = true;
+            locationFromSearch = false;
+        }
+         else {
             reject("Geolocation is not supported by this browser.");
         }
     });
@@ -176,12 +253,19 @@ const handleGenerateButtonClick = async () => {
     let feelings = document.getElementById('feelings').value;
     let currentDate = new Date();
     let date = getCurrentDate(currentDate);
+    // TODO: set up time variable for later integration
     let time = getCurrentTime(currentDate);
-    if (latitude === undefined || longitude === undefined) {
-    await handleLocationButtonClick();
+    // TODO: Handle those errors through a better UI 
+    if (!locationFromSearch && !locationFromCoords) {
+      alert ("Please enter a city name or click on the location button to get weather data.");
+      return;
+    }
+    if (feelings === '') {
+      alert ("Please enter your journal entry.");
+      return;
     }
     // Destructuring assignment to get the temperature from the returned object
-    const { main: {temp}} = await fetchWeatherData(latitude, longitude);
+    const { main: {temp}} = await fetchWeatherData(latitude, longitude, selectedCity);
     const journalEntry = {
         temp, 
         date: date,
@@ -191,6 +275,7 @@ const handleGenerateButtonClick = async () => {
     const objectStore = transaction.objectStore("weatherData");
     objectStore.add(journalEntry);
     isUIUpdated = false;
+    document.getElementById('feelings').value = ''; // reset the input fields
     updateUI();
     } catch(error) {
         console.log(error);
@@ -282,16 +367,26 @@ const temperatureElement = (kelvin) => {
 
 // Event Listeners
 uiElements.generateButton.addEventListener('click', handleGenerateButtonClick);
-uiElements.locationButton.addEventListener('click', handleLocationButtonClick);
+uiElements.locationButton.addEventListener('click', async () => {await handleLocationButtonClick()});
 uiElements.clearButton.addEventListener('click', handleClearButtonClick);
 uiElements.selectElement.addEventListener('change', handleUnitsChange);
 uiElements.exportButton.addEventListener('click', handleExportButtonClick);
 uiElements.importButton.addEventListener('click', handleImportButtonClick);
 uiElements.fileInputButton.addEventListener('change', handleImportFileChange);
+uiElements.autoCompleteContainer.addEventListener('click', (event) => {
+    event.stopImmediatePropagation();
+  });
+uiElements.autocompleteInput.addEventListener('keyup', handleKeyUp);
+document.addEventListener('click', hideDropDown);
 
 // GET request function
 const fetchWeatherData = async (latitude, longitude) => {
-    const res = await fetch(`/fetchWeatherData?lat=${latitude}&lon=${longitude}`);
+    let res;
+    if (locationFromSearch) {
+    res = await fetch(`/fetchWeatherData?city=${selectedCity}`);
+    } else if (locationFromCoords) {
+      res = await fetch(`/fetchWeatherData?lat=${latitude}&lon=${longitude}`);
+    }
     if (!res.ok) {
         throw new Error(`HTTP error!: ${res.status}`)
     }
@@ -301,4 +396,26 @@ const fetchWeatherData = async (latitude, longitude) => {
     } catch (error) {
       console.log('error', error);
     }
+}
+
+const searchCity = async (query) => {
+    try {
+        const response = await fetch('/city', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ query: query }),
+        });
+    
+        if (!response.ok) {
+          throw new Error('Request failed with status: ' + response.status);
+        }
+    
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error:', error);
+        throw error;
+      }
 }

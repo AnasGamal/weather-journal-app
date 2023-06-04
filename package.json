@@ -1,7 +1,9 @@
 {
   "dependencies": {
+    "@placekit/client-js": "^1.0.0",
     "body-parser": "^1.19.1",
     "cors": "^2.8.5",
+    "countries": "^1.0.2",
     "dotenv": "^16.0.3",
     "express": "^4.17.2",
     "flowbite": "^1.6.5",
@@ -15,5 +17,8 @@
   "scripts": {
     "build:css": "tailwindcss build ./src/app.css -o ./src/tailwind.css",
     "build": "webpack"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
