@@ -17,5 +17,8 @@
   "scripts": {
     "build:css": "tailwindcss build ./src/app.css -o ./src/tailwind.css",
     "build": "webpack"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
