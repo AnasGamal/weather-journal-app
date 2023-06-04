@@ -3,7 +3,7 @@ let isUIUpdated = false;
 let db;
 let latitude;
 let longitude;
-
+let searchTimeout;
 let dateOptions = { month: 'long', day: 'numeric', year: 'numeric' };
 let timeOptions = { hour: 'numeric', minute: 'numeric', hour12: true, timeZoneName: 'short' };
 // TODO: add an error container to the UI
@@ -55,6 +55,8 @@ request.onupgradeneeded = event => {
 // Function definitions
 
 const handleKeyUp = async () => {
+    clearTimeout(searchTimeout);
+    // TODO: consider using trim() to remove leading and trailing spaces
     let query = uiElements.autocompleteInput.value;
     // indicate that the location is obtained from the search bar and not from the Geolocation API
     locationFromCoords = false;
@@ -64,12 +66,15 @@ const handleKeyUp = async () => {
       // handle empty city input asynchonously
       locationFromSearch = false;
     } else {
+      // wait 1 second before making the API call
+      searchTimeout = setTimeout(async () => {
     try {
-    let results = await searchCity(query);
+    const results = await searchCity(query);
     renderOptions(results);
     } catch (error) {
     console.log('error', error);
     }
+    }, 1000);
   }
 }
 
