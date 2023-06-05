@@ -11,7 +11,13 @@ const app = express();
 require('dotenv').config();
 const port = process.env.PORT || 3000;
 // Load PlaceKit API Key from environment variables 
-const pk = placekit(process.env.PLACEKIT_API_KEY, { language: 'en', types: ['city'], maxResults: 4, countryByIP: true, countries: ['US']});
+const pk = placekit(process.env.PLACEKIT_API_KEY,{
+  language: 'en',
+  types: ['city'],
+  maxResults: 4,
+  countryByIP: true,
+  countries: ['US']
+  });
 
 let fetch;
 (async () => {
@@ -42,9 +48,10 @@ app.use(express.static('src/'));
 
 // Autocomplete setup
 app.post('/city', async (req, res) => { try {
-  const results = await pk.search(req.body.query);
+  const results = await pk.search(req.body.query, { forwardIP: req.ip });
+  console.log(req.ip);
   res.json(results.results);
-  } catch (error) {
+} catch (error) {
     console.log('error', error);
     res.status(500).send({error: 'Server error'});
   }
