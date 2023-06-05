@@ -82,11 +82,10 @@ const renderOptions = (results) => {
     const dropDownResults = document.createElement('div');
     if (results.length > 0) {
     results.map(result => {
-      let displayedResult = `${result.city}, ${result.administrative}`;
       const dropDownResult = document.createElement('div');
       dropDownResult.classList.add('dropDownResult');
-      dropDownResult.textContent = displayedResult;
-      dropDownResult.addEventListener('click', () => selectOption(displayedResult));
+      dropDownResult.textContent = result;
+      dropDownResult.addEventListener('click', () => selectOption(result));
       dropDownResults.appendChild(dropDownResult);
     });
   } else {
@@ -407,7 +406,7 @@ const searchCity = async (query) => {
           },
           body: JSON.stringify({ query: query }),
         });
-    
+
         if (!response.ok) {
           throw new Error('Request failed with status: ' + response.status);
         }

@@ -1,7 +1,6 @@
 // Setup empty JS object to act as endpoint for all routes
 projectData = [];  
-// Requre PlaceKit client library
-const placekit = require('@placekit/client-js');
+
 // Require Express to run server and routes
 const express = require('express');
 const path = require('path');
@@ -10,13 +9,7 @@ const app = express();
 // load .env file
 require('dotenv').config();
 const port = process.env.PORT || 3000;
-// Load PlaceKit API Key from environment variables 
-const pk = placekit(process.env.PLACEKIT_API_KEY, { language: 'en', types: ['city'], maxResults: 4, countryByIP: true, countries: ['US']});
 
-let fetch;
-(async () => {
-  fetch = (await import('node-fetch')).default;
-})();
 // Serve static files from the 'src' directory
 app.use(express.static(path.join(__dirname, 'src')));
 
@@ -40,10 +33,19 @@ app.use(cors());
 // Initialize the main project folder
 app.use(express.static('src/'));
 
+var axios = require('axios');
+
 // Autocomplete setup
 app.post('/city', async (req, res) => { try {
-  const results = await pk.search(req.body.query);
-  res.json(results.results);
+  const googlePlacesApiKey = process.env.GOOGLEPLACES_API_KEY;
+  await axios({
+    method: 'get',
+    url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${req.body.query}&types=geocode&language=en&key=${googlePlacesApiKey}`,
+    headers: { }
+  })
+  .then((response) => {
+      res.send(response.data.predictions.map((prediction) => prediction.description));
+  });
   } catch (error) {
     console.log('error', error);
     res.status(500).send({error: 'Server error'});
@@ -81,11 +83,10 @@ const fetchWeatherData = async(req)=>{
     weatherAPIurl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&apiKey=${openWeatherApiKey}`;
     console.log(weatherAPIurl);
   }
-  const res = await fetch(weatherAPIurl);
+  const res = await axios.get(weatherAPIurl);
   console.log(res);
   try{
-      const data = await res.json();
-      return data;
+      return res.data;
   }
   catch(error) {
       console.log('error', error);
