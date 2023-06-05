@@ -11,7 +11,16 @@ const app = express();
 require('dotenv').config();
 const port = process.env.PORT || 3000;
 // Load PlaceKit API Key from environment variables 
-const pk = placekit(process.env.PLACEKIT_API_KEY, { language: 'en', types: ['city'], maxResults: 4, countryByIP: true, countries: ['US']});
+const pk = placekit(process.env.PLACEKIT_API_KEY);
+let reqIP;
+pk.configure({
+  language: 'en', 
+  types: ['city'], 
+  maxResults: 4, 
+  countryByIP: true, 
+  forwardIP: reqIP,
+  countries: ['US']
+});
 
 let fetch;
 (async () => {
@@ -42,7 +51,9 @@ app.use(express.static('src/'));
 
 // Autocomplete setup
 app.post('/city', async (req, res) => { try {
-  const results = await pk.search(req.body.query);
+  const results = await pk.search(req.body.query); // Forward client IP address to PlaceKit API for countryByIP feature
+  reqIP = req.ip;
+  console.log (reqIP);
   res.json(results.results);
   } catch (error) {
     console.log('error', error);
