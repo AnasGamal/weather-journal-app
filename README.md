@@ -14,6 +14,8 @@ The Weather Journal is an interactive web application designed to provide curren
 
 - **Geolocation API:** The user's location is fetched using the Geolocation API, which is built into modern web browsers. This API allows the application to access the user's current latitude and longitude coordinates, which are then used to fetch the weather data.
 
+- **Google Places API:** This API is utilized to enable an autocomplete feature, thereby ensuring a standardized format for user location input. Once the user input is obtained, it is sent to the OpenWeather API for geocoding to fetch the corresponding weather data."
+
 - **IndexedDB:** This low-level API for client-side storage of significant amounts of structured data has been used for maintaining the user entries in the weather journal.
 
 - **HTML, CSS, JavaScript:** Used to structure, style, and add interactivity to the web page.
